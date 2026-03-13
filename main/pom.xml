@@ -15,10 +15,16 @@
     <description>main</description>
     <url/>
     <licenses>
-        <license/>
+        <license>
+            <name>GNU General Public License v2.0</name>
+            <url>https://www.gnu.org/licenses/old-licenses/gpl-2.0.html</url>
+            <distribution>repo</distribution>
+        </license>
     </licenses>
     <developers>
-        <developer/>
+        <developer>
+            <organizationUrl>https://github.com/TrainBeans</organizationUrl>
+        </developer>
     </developers>
     <scm>
         <connection/>
