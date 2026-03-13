@@ -198,10 +198,13 @@ All 36 tests should pass:
 
 ```
 TrackWarrants/
+├── .github/
+│   └── copilot-instructions.md      ← Copilot agent onboarding
 ├── LICENSE
 ├── README.md
 ├── QUICKSTART.md
 ├── pom.xml                          ← parent POM (aggregator)
+├── start.sh / stop.sh / status.sh / restart.sh
 └── main/
     ├── pom.xml
     └── src/

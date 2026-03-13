@@ -41,6 +41,21 @@ Three sample warrants are seeded automatically on every startup.
 
 ---
 
+## 2b. Helper scripts (alternative to Maven wrapper)
+
+From the **repository root** (not `main/`):
+
+| Script | Command | What it does |
+|--------|---------|--------------|
+| Start | `./start.sh` | Builds the JAR if missing, then starts in background |
+| Stop | `./stop.sh` | Gracefully stops the running application |
+| Status | `./status.sh` | Shows running/stopped state, PID, port, and log path |
+| Restart | `./restart.sh` | Runs `stop.sh` then `start.sh` |
+
+Logs are written to `trackwarrants.log` in the repository root.
+
+---
+
 ## 3. Access points
 
 | Resource | URL |
@@ -85,13 +100,24 @@ curl http://localhost:8080/api/warrants/next-number
 # Get a single warrant
 curl http://localhost:8080/api/warrants/2026-03-13-1
 
-# Create a warrant (minimal example)
+# Create a warrant (all required fields must be supplied)
+#
+# Warrant ID format: {yyyy-MM-dd}-{warrantNumber}
+# warrantNumber is the integer returned by GET /api/warrants/next-number
+#
+# Validation rules:
+#   - warrantId must be unique (duplicate IDs are rejected with 409 Conflict)
+#   - warrantId, warrantNumber, warrantDate, trainId, and startingLocation are required
 curl -X POST http://localhost:8080/api/warrants \
   -H "Content-Type: application/json" \
   -d '{
+    "warrantId": "2026-03-13-1",
+    "warrantNumber": 1,
+    "warrantDate": "2026-03-13",
+    "trainId": "BNSF-4523",
+    "startingLocation": "Barstow",
     "trainCrew": "Smith",
     "location": "Barstow",
-    "trainId": "BNSF-4523",
     "issuedBy": "Jones",
     "line2Instruction": "Proceed from Barstow to Needles on Main Track"
   }'
@@ -126,6 +152,16 @@ Expected result: **36 tests, 0 failures**.
 | `TrackWarrantFormContractTest` | 7 |
 | `TrackWarrantEntryToOutputE2ETest` | 2 |
 | `MainApplicationTests` | 1 |
+
+### JaCoCo coverage report
+
+After `./mvnw test` (or `./mvnw verify`), the HTML coverage report is generated at:
+
+```
+main/target/site/jacoco/index.html
+```
+
+Open it in a browser to view line and branch coverage.
 
 ---
 
