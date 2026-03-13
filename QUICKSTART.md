@@ -1,249 +1,160 @@
-# Track Warrant Management System - Quick Start Guide
+# Track Warrant Management System — Quick Start
 
-## 🚀 Starting the Application
+## Prerequisites
 
-### Option 1: Using Maven
+- **Java 17** or later (`java -version`)
+- **Git** (to clone the repository)
+- Internet access on first build (Maven downloads dependencies)
+
+---
+
+## 1. Clone and build
+
 ```bash
-cd /home/paul/Trainbeans/TrackWarrants/main
-mvn spring-boot:run
+git clone https://github.com/TrainBeans/TrackWarrants.git
+cd TrackWarrants/main
+./mvnw clean package -DskipTests
 ```
 
-### Option 2: Using the JAR file
+> **Windows:** use `mvnw.cmd` instead of `./mvnw`.
+
+---
+
+## 2. Run the application
+
+### Option A — Maven wrapper (recommended for development)
+
 ```bash
-cd /home/paul/Trainbeans/TrackWarrants/main
-mvn clean package -DskipTests
+cd TrackWarrants/main
+./mvnw spring-boot:run
+```
+
+### Option B — Packaged JAR
+
+```bash
+cd TrackWarrants/main
 java -jar target/main-0.0.1-SNAPSHOT.jar
 ```
 
-The application will start on **http://localhost:8080**
+The application starts on **http://localhost:8080**.  
+Three sample warrants are seeded automatically on every startup.
 
 ---
 
-## 🌐 Access Points
+## 3. Access points
 
-| Resource | URL | Description |
-|----------|-----|-------------|
-| **Web UI** | http://localhost:8080 | Interactive web interface |
-| **H2 Console** | http://localhost:8080/h2-console | Database management console |
-| **API Base** | http://localhost:8080/api/warrants | REST API base endpoint |
-| **Swagger UI** | http://localhost:8080/swagger-ui.html | API documentation (if configured) |
-| **Actuator** | http://localhost:8080/actuator | Application health & metrics |
+| Resource | URL |
+|----------|-----|
+| **Warrant entry form** | http://localhost:8080 |
+| **Warrant output / print form** | http://localhost:8080/warrant-form.html?id={warrantId} |
+| **Swagger UI** | http://localhost:8080/swagger-ui.html |
+| **H2 Console** | http://localhost:8080/h2-console |
+| **Actuator** | http://localhost:8080/actuator |
+
+### H2 console connection settings
+
+| Setting | Value |
+|---------|-------|
+| JDBC URL | `jdbc:h2:mem:trackwarrants` |
+| Username | `sa` |
+| Password | *(leave empty)* |
 
 ---
 
-## 📋 Sample API Calls
+## 4. Fill in and submit a warrant (UI walkthrough)
 
-### 1. Get All Warrants
-```bash
-curl http://localhost:8080/api/warrants | jq
-```
+1. Open **http://localhost:8080** — the entry form loads with the next warrant number and today's date pre-filled.
+2. Fill in **TO**, **AT**, and **TRAIN/ENGINE** header fields.
+3. Check the box next to each line you want to include, then fill in the blanks for that line.  
+   *(Filling a blank automatically checks its box.)*
+4. Fill in the footer fields: **OK** time, **DISPATCHER**, **RELAYED TO**, **COPIED BY**, etc.
+5. Click **Submit**.  The form redirects to the printable output form.
+6. On the output form, choose **Print (Standard)** or **Print (58mm Receipt)** as needed.
 
-### 2. Get Active Warrants Only
-```bash
-curl http://localhost:8080/api/warrants/active | jq
-```
+---
 
-### 3. Get Single Warrant
-```bash
-curl http://localhost:8080/api/warrants/TW-2026-001 | jq
-```
+## 5. Quick API reference
 
-### 4. Get Warrants by Train ID
 ```bash
-curl http://localhost:8080/api/warrants/train/BNSF-4523 | jq
-```
+# List all warrants
+curl http://localhost:8080/api/warrants
 
-### 5. Create New Warrant
-```bash
+# Get next daily warrant number
+curl http://localhost:8080/api/warrants/next-number
+
+# Get a single warrant
+curl http://localhost:8080/api/warrants/2026-03-13-1
+
+# Create a warrant (minimal example)
 curl -X POST http://localhost:8080/api/warrants \
   -H "Content-Type: application/json" \
   -d '{
-    "warrantId": "TW-2026-100",
-    "trainId": "FREIGHT-500",
-    "startingLocation": "Kansas City Yard",
-    "endingLocation": "Oklahoma City Terminal",
-    "trackName": "Central Main",
-    "maxSpeed": 70,
-    "issuedBy": "Dispatcher Johnson",
-    "instructions": "Proceed with normal operations",
-    "direction": "SOUTH"
-  }' | jq
+    "trainCrew": "Smith",
+    "location": "Barstow",
+    "trainId": "BNSF-4523",
+    "issuedBy": "Jones",
+    "line2Instruction": "Proceed from Barstow to Needles on Main Track"
+  }'
+
+# Complete a warrant
+curl -X PUT http://localhost:8080/api/warrants/2026-03-13-1/complete
+
+# Cancel a warrant
+curl -X PUT http://localhost:8080/api/warrants/2026-03-13-1/cancel
+
+# Delete a warrant
+curl -X DELETE http://localhost:8080/api/warrants/2026-03-13-1
 ```
 
-### 6. Complete a Warrant
-```bash
-curl -X PUT http://localhost:8080/api/warrants/TW-2026-100/complete | jq
-```
-
-### 7. Cancel a Warrant
-```bash
-curl -X PUT http://localhost:8080/api/warrants/TW-2026-100/cancel | jq
-```
-
-### 8. Delete a Warrant
-```bash
-curl -X DELETE http://localhost:8080/api/warrants/TW-2026-100
-```
+For the full API reference see the Swagger UI at http://localhost:8080/swagger-ui.html.
 
 ---
 
-## 🧪 Running Tests
+## 6. Run the tests
 
-### Run All Tests
 ```bash
-cd /home/paul/Trainbeans/TrackWarrants/main
-mvn test
+cd TrackWarrants/main
+./mvnw test
 ```
 
-### Run Only Integration Tests
-```bash
-mvn test -Dtest=TrackWarrantControllerIntegrationTest
-```
+Expected result: **36 tests, 0 failures**.
 
-### Run Only Service Tests
-```bash
-mvn test -Dtest=TrackWarrantServiceTest
-```
-
-### Run API Test Script
-```bash
-cd /home/paul/Trainbeans/TrackWarrants
-./test-api.sh
-```
+| Test class | Tests |
+|-----------|-------|
+| `TrackWarrantControllerIntegrationTest` | 13 |
+| `TrackWarrantServiceTest` | 13 |
+| `TrackWarrantFormContractTest` | 7 |
+| `TrackWarrantEntryToOutputE2ETest` | 2 |
+| `MainApplicationTests` | 1 |
 
 ---
 
-## 🗄️ Database Configuration
-
-The application uses an H2 in-memory database with the following settings:
-
-- **JDBC URL:** `jdbc:h2:mem:trackwarrants`
-- **Username:** `sa`
-- **Password:** *(empty)*
-- **Driver:** `org.h2.Driver`
-
-### Accessing H2 Console:
-1. Navigate to http://localhost:8080/h2-console
-2. Use the connection settings above
-3. Click "Connect"
-
-### Sample SQL Queries:
-```sql
--- View all warrants
-SELECT * FROM track_warrants;
-
--- View active warrants
-SELECT * FROM track_warrants WHERE status = 'ACTIVE';
-
--- Count warrants by status
-SELECT status, COUNT(*) FROM track_warrants GROUP BY status;
-
--- Find warrants expiring soon
-SELECT warrant_id, train_id, expiration_date_time 
-FROM track_warrants 
-WHERE expiration_date_time < CURRENT_TIMESTAMP + INTERVAL '2' HOUR
-AND status = 'ACTIVE';
-```
-
----
-
-## 📊 Test Results
-
-**Total Tests:** 26 tests
-- **Integration Tests:** 12 tests (REST API)
-- **Service Unit Tests:** 13 tests (Business Logic)
-- **Basic Application Test:** 1 test
-
-**Status:** ✅ All tests passing
-
----
-
-## 🎯 Key Features Implemented
-
-✅ **Create Warrant** - POST endpoint with validation  
-✅ **Retrieve All Warrants** - GET endpoint with full list  
-✅ **Retrieve Single Warrant** - GET endpoint by warrant ID  
-✅ **Retrieve Active Warrants** - GET endpoint filtered by status  
-✅ **Complete Warrant** - PUT endpoint to mark as completed  
-✅ **Cancel Warrant** - PUT endpoint to cancel  
-✅ **Delete Warrant** - DELETE endpoint to remove  
-✅ **H2 Database** - In-memory storage with JPA  
-✅ **RESTful Design** - Proper HTTP methods and status codes  
-✅ **Error Handling** - Global exception handler  
-✅ **Logging** - Comprehensive logging with SLF4J  
-✅ **Sample Data** - Pre-loaded with 3 sample warrants  
-✅ **Web UI** - Interactive interface for testing  
-✅ **Automatic Timestamps** - Created/modified tracking  
-
----
-
-## 🔍 Architecture Overview
-
-```
-┌─────────────────────────────────────────────────┐
-│              REST Controller Layer               │
-│         (TrackWarrantController.java)           │
-│    Handles HTTP requests/responses              │
-└─────────────────┬───────────────────────────────┘
-                  │
-┌─────────────────▼───────────────────────────────┐
-│              Service Layer                       │
-│         (TrackWarrantService.java)              │
-│    Business logic & transaction management      │
-└─────────────────┬───────────────────────────────┘
-                  │
-┌─────────────────▼───────────────────────────────┐
-│              Repository Layer                    │
-│      (TrackWarrantRepository.java)              │
-│    Data access with Spring Data JPA             │
-└─────────────────┬───────────────────────────────┘
-                  │
-┌─────────────────▼───────────────────────────────┐
-│              H2 Database                         │
-│         (In-Memory Database)                    │
-│    Stores track warrant records                 │
-└─────────────────────────────────────────────────┘
-```
-
----
-
-## 📝 Sample Warrants Included
-
-1. **TW-2026-001** - Chicago to St. Louis (ACTIVE)
-2. **TW-2026-002** - Denver to Salt Lake City (ACTIVE)
-3. **TW-2026-003** - Pittsburgh to Cleveland (COMPLETED)
-
----
-
-## 🐛 Troubleshooting
+## 7. Troubleshooting
 
 ### Port 8080 already in use
+
 ```bash
-# Find process using port 8080
+# Find the process
 lsof -i :8080
 
-# Kill the process
-kill -9 <PID>
+# Stop it
+kill <PID>
 ```
 
-### Application won't start
+### Application will not start
+
 ```bash
-# Clean and rebuild
-mvn clean install
+# Verify Java version (must be 17+)
+java -version
 
-# Check Java version
-java -version  # Should be Java 17
+# Clean rebuild
+cd TrackWarrants/main
+./mvnw clean package -DskipTests
 ```
 
-### Tests failing
+### Tests failing after a code change
+
 ```bash
-# Clean test data and rerun
-mvn clean test
+./mvnw clean test
 ```
-
----
-
-## 📞 Support
-
-For issues or questions, check the application logs in the console output.
 
