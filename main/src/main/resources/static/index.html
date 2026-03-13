@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Warrant Management System</title>
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #e8e8e8;
+            font-size: 11pt;
+        }
+
+        h1 {
+            color: #000;
+            border: 3px double #000;
+            padding: 15px;
+            text-align: center;
+            background: white;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            font-size: 24pt;
+        }
+
+        h2 {
+            color: #000;
+            margin-top: 20px;
+            font-size: 14pt;
+            text-transform: uppercase;
+            border-bottom: 2px solid #000;
+            padding-bottom: 5px;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border: 2px solid #000;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        .form-header {
+            background-color: #000;
+            color: white;
+            padding: 10px;
+            margin: -20px -20px 20px -20px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 14pt;
+            letter-spacing: 1px;
+        }
+
+        .top-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px 20px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 3px;
+            font-weight: bold;
+            color: #000;
+            font-size: 10pt;
+            text-transform: uppercase;
+        }
+
+        .required {
+            color: #c00;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #000;
+            background-color: #fff;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 11pt;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            background-color: #ffffcc;
+        }
+
+        textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        .warrant-header-box, .warrant-footer-box {
+            border: 2px solid #000;
+            padding: 8px 10px;
+            margin-bottom: 10px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .warrant-header-row, .warrant-footer-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
+        .hdr-label, .ftr-label {
+            font-weight: bold;
+            white-space: nowrap;
+            font-size: 10pt;
+        }
+
+        .hdr-narrow { width: 60px; padding: 4px 6px; border: none; border-bottom: 2px solid #000; font-size: 11pt; }
+        .hdr-wide   { flex: 1;    padding: 4px 6px; border: none; border-bottom: 2px solid #000; font-size: 11pt; }
+        .hdr-date   { width: 160px; padding: 4px 6px; border: none; border-bottom: 2px solid #000; font-size: 11pt; }
+        .hdr-spacer { flex: 1; }
+
+        .ftr-narrow { width: 80px;  padding: 4px 6px; border: none; border-bottom: 2px solid #000; font-size: 11pt; }
+        .ftr-wide   { flex: 1;     padding: 4px 6px; border: none; border-bottom: 2px solid #000; font-size: 11pt; }
+
+        .field-hint {
+            font-size: 9pt;
+            color: #666;
+            font-style: italic;
+            margin-top: 2px;
+        }
+
+        .lines-box {
+            border: 2px solid #000;
+            padding: 12px;
+            background: #fff;
+        }
+
+        .line-row {
+            display: grid;
+            grid-template-columns: 34px 24px 1fr;
+            gap: 8px;
+            align-items: start;
+            margin-bottom: 10px;
+            border-bottom: 1px dashed #bbb;
+            padding-bottom: 8px;
+        }
+
+        .line-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .line-num {
+            font-weight: bold;
+            padding-top: 4px;
+        }
+
+        .line-check {
+            width: 18px;
+            height: 18px;
+            margin-top: 4px;
+        }
+
+        .line-text {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .line-text .txt {
+            font-size: 10pt;
+        }
+
+        .line-text input {
+            display: inline-block;
+            width: auto;
+            min-width: 90px;
+            max-width: 220px;
+            padding: 4px 6px;
+            font-size: 10pt;
+            border-width: 1px;
+        }
+
+        .line-text input.wide {
+            min-width: 180px;
+            max-width: 320px;
+        }
+
+        .line-text input.narrow {
+            min-width: 70px;
+            max-width: 90px;
+            text-align: center;
+        }
+
+        .button-bar {
+            margin-top: 18px;
+            padding-top: 12px;
+            border-top: 2px solid #000;
+        }
+
+        button {
+            background-color: #000;
+            color: white;
+            padding: 12px 20px;
+            border: 2px solid #000;
+            cursor: pointer;
+            font-size: 10pt;
+            font-weight: bold;
+            margin-right: 10px;
+            font-family: 'Courier New', Courier, monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            background-color: #333;
+        }
+
+        button.danger {
+            background-color: #c00;
+            border-color: #c00;
+        }
+
+        button.danger:hover {
+            background-color: #900;
+        }
+
+        button.success {
+            background-color: #060;
+            border-color: #060;
+        }
+
+        button.success:hover {
+            background-color: #040;
+        }
+
+        button.info {
+            background-color: #069;
+            border-color: #069;
+        }
+
+        button.info:hover {
+            background-color: #047;
+        }
+
+        #warrantList {
+            margin-top: 20px;
+        }
+
+        .warrant-card {
+            background-color: #fff;
+            border: 2px solid #000;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .warrant-card h3 {
+            margin-top: 0;
+            color: #000;
+            font-size: 14pt;
+            border-bottom: 1px solid #000;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+
+        .warrant-status {
+            display: inline-block;
+            padding: 5px 12px;
+            font-size: 10pt;
+            font-weight: bold;
+            border: 2px solid #000;
+            margin-left: 10px;
+        }
+
+        .status-ACTIVE {
+            background-color: #060;
+            color: white;
+        }
+
+        .status-COMPLETED {
+            background-color: #666;
+            color: white;
+        }
+
+        .status-CANCELLED {
+            background-color: #c00;
+            color: white;
+        }
+
+        .status-EXPIRED {
+            background-color: #f90;
+            color: white;
+        }
+
+        .warrant-actions {
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #000;
+        }
+
+        .info-row {
+            margin: 8px 0;
+            color: #000;
+            line-height: 1.6;
+        }
+
+        .info-label {
+            font-weight: bold;
+            display: inline-block;
+            width: 200px;
+        }
+
+        #response {
+            background-color: #fff;
+            padding: 15px;
+            border: 2px solid #000;
+            white-space: pre-wrap;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 10pt;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .links {
+            background-color: #fff;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px solid #000;
+            text-align: center;
+        }
+
+        .links strong {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 12pt;
+        }
+
+        .links a {
+            color: #069;
+            text-decoration: underline;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+
+        .links a:hover {
+            color: #047;
+        }
+    </style>
+</head>
+<body>
+    <h1>TRACK WARRANT MANAGEMENT SYSTEM</h1>
+
+    <div class="links">
+        <strong>SYSTEM LINKS</strong>
+        <a href="/h2-console" target="_blank">DATABASE CONSOLE</a>
+        <a href="/swagger-ui.html" target="_blank">API DOCUMENTATION</a>
+    </div>
+
+    <div class="container">
+        <div class="form-header">CREATE NEW TRACK WARRANT (LINE-DRIVEN)</div>
+        <form id="createWarrantForm">
+            <!-- Header: NO / DATE / TO / AT -->
+            <div class="warrant-header-box">
+                <div class="warrant-header-row">
+                    <span class="hdr-label">NO</span>
+                    <input type="number" id="warrantNumber" min="1" class="hdr-narrow" placeholder="1" required>
+                    <span class="hdr-spacer"></span>
+                    <input type="date" id="warrantDate" class="hdr-date" required>
+                </div>
+                <div class="warrant-header-row">
+                    <span class="hdr-label">TO</span>
+                    <input type="text" id="trainCrew" class="hdr-wide" placeholder="Train crew names" required>
+                    <span class="hdr-label" style="margin-left:12px;">AT</span>
+                    <input type="text" id="location" class="hdr-wide" placeholder="Location" required>
+                </div>
+                <div class="warrant-header-row">
+                    <span class="hdr-label">TRAIN/ENGINE</span>
+                    <input type="text" id="trainId" class="hdr-wide" placeholder="BNSF-4523" required>
+                </div>
+            </div>
+
+            <div class="field-hint" style="margin-bottom:10px;">(Mark "X" in box for each item instructed)</div>
+
+            <div class="lines-box">
+                <div class="line-row">
+                    <div class="line-num">1.</div>
+                    <input class="line-check" type="checkbox" id="l1_on">
+                    <div class="line-text">
+                        <span class="txt">Track Warrant NO.</span>
+                        <input id="l1_void_number" class="wide" type="text" placeholder="Warrant number">
+                        <span class="txt">is Void.</span>
+                    </div>
+                </div>
+
+                <div class="line-row">
+                    <div class="line-num">2.</div>
+                    <input class="line-check" type="checkbox" id="l2_on" checked>
+                    <div class="line-text">
+                        <span class="txt">Proceed from</span>
+                        <input id="l2_from" class="wide" type="text" placeholder="Starting location">
+                        <span class="txt">to</span>
+                        <input id="l2_to" class="wide" type="text" placeholder="Ending location">
+                        <span class="txt">on</span>
+                        <input id="l2_track" type="text" placeholder="Track">
+                        <span class="txt">Track</span>
+                    </div>
+                </div>
+
+                <div class="line-row">
+                    <div class="line-num">3.</div>
+                    <input class="line-check" type="checkbox" id="l3_on">
+                    <div class="line-text">
+                        <span class="txt">Proceed from</span>
+                        <input id="l3_from" class="wide" type="text" placeholder="Starting location">
+                        <span class="txt">to</span>
+                        <input id="l3_to" class="wide" type="text" placeholder="Ending location">
+                        <span class="txt">on</span>
+                        <input id="l3_track" type="text" placeholder="Track">
+                        <span class="txt">Track</span>
+                    </div>
+                </div>
+
+                <div class="line-row">
+                    <div class="line-num">4.</div>
+                    <input class="line-check" type="checkbox" id="l4_on">
+                    <div class="line-text">
+                        <span class="txt">Work between</span>
+                        <input id="l4_from" class="wide" type="text" placeholder="Location A">
+                        <span class="txt">and</span>
+                        <input id="l4_to" class="wide" type="text" placeholder="Location B">
+                        <span class="txt">on</span>
+                        <input id="l4_track" type="text" placeholder="Track">
+                        <span class="txt">Track</span>
+                    </div>
+                </div>
+
+                <div class="line-row">
+                    <div class="line-num">5.</div>
+                    <input class="line-check" type="checkbox" id="l5_on">
+                    <div class="line-text">
+                        <span class="txt">Not in effect until</span>
+                        <input id="l5_until" class="narrow" type="text" placeholder="HHMM">
+                        <span class="txt">M</span>
+                    </div>
+                </div>
+
+                <div class="line-row">
+                    <div class="line-num">6.</div>
+                    <input class="line-check" type="checkbox" id="l6_on">
+                    <div class="line-text">
+                        <span class="txt">This Authority Expires at</span>
+                        <input id="l6_time" class="narrow" type="text" placeholder="HH:MM">
+                        <span class="txt">M</span>
+                    </div>
+                </div>
+
+                <div class="line-row">
+                    <div class="line-num">7.</div>
+                    <input class="line-check" type="checkbox" id="l7_on">
+                    <div class="line-text">
+                        <span class="txt">Not in effect until after arrival of</span>
+                        <input id="l7_train" type="text" placeholder="Train ID">
+                        <span class="txt">at</span>
+                        <input id="l7_at" class="wide" type="text" placeholder="Location">
+                    </div>
+                </div>
+
+                <div class="line-row">
+                    <div class="line-num">8.</div>
+                    <input class="line-check" type="checkbox" id="l8_on">
+                    <div class="line-text">
+                        <span class="txt">Hold Main Track at Last Named Point.</span>
+                    </div>
+                </div>
+
+                <div class="line-row">
+                    <div class="line-num">9.</div>
+                    <input class="line-check" type="checkbox" id="l9_on">
+                    <div class="line-text">
+                        <span class="txt">Do Not Foul Limints ahead of</span>
+                        <input id="l9_ahead" class="wide" type="text" placeholder="Location/Limit">
+                        <span class="txt">.</span>
+                    </div>
+                </div>
+
+                <div class="line-row">
+                    <div class="line-num">10.</div>
+                    <input class="line-check" type="checkbox" id="l10_on">
+                    <div class="line-text">
+                        <span class="txt">Clear Main Track at Last Named Point.</span>
+                    </div>
+                </div>
+
+                <div class="line-row">
+                    <div class="line-num">11.</div>
+                    <input class="line-check" type="checkbox" id="l11_on">
+                    <div class="line-text">
+                        <span class="txt">Between</span>
+                        <input id="l11_from" class="wide" type="text" placeholder="Location A">
+                        <span class="txt">and</span>
+                        <input id="l11_to" class="wide" type="text" placeholder="Location B">
+                        <span class="txt">Make All Movements at restricted speed. Limits occupied by train or engine.</span>
+                    </div>
+                </div>
+
+                <div class="line-row">
+                    <div class="line-num">12.</div>
+                    <input class="line-check" type="checkbox" id="l12_on">
+                    <div class="line-text">
+                        <span class="txt">Between</span>
+                        <input id="l12_from" class="wide" type="text" placeholder="Location A">
+                        <span class="txt">and</span>
+                        <input id="l12_to" class="wide" type="text" placeholder="Location B">
+                        <span class="txt">Make All Movements at restricted speed and stop short of Men or Machines fouling track.</span>
+                    </div>
+                </div>
+
+                <div class="line-row">
+                    <div class="line-num">13.</div>
+                    <input class="line-check" type="checkbox" id="l13_on">
+                    <div class="line-text">
+                        <span class="txt">Do not exceed</span>
+                        <input id="l13_mph" class="narrow" type="number" placeholder="MPH">
+                        <span class="txt">MPH between</span>
+                        <input id="l13_from" class="wide" type="text" placeholder="Location A">
+                        <span class="txt">and</span>
+                        <input id="l13_to" class="wide" type="text" placeholder="Location B">
+                    </div>
+                </div>
+
+                <div class="line-row">
+                    <div class="line-num">14.</div>
+                    <input class="line-check" type="checkbox" id="l14_on">
+                    <div class="line-text">
+                        <span class="txt">Do not exceed</span>
+                        <input id="l14_mph" class="narrow" type="number" placeholder="MPH">
+                        <span class="txt">MPH between</span>
+                        <input id="l14_from" class="wide" type="text" placeholder="Location A">
+                        <span class="txt">and</span>
+                        <input id="l14_to" class="wide" type="text" placeholder="Location B">
+                    </div>
+                </div>
+
+                <div class="line-row">
+                    <div class="line-num">15.</div>
+                    <input class="line-check" type="checkbox" id="l15_on">
+                    <div class="line-text">
+                        <span class="txt">Protection as prescribed by Rule 99 not required.</span>
+                    </div>
+                </div>
+
+                <div class="line-row">
+                    <div class="line-num">16.</div>
+                    <input class="line-check" type="checkbox" id="l16_on">
+                    <div class="line-text">
+                        <span class="txt">Track Bulletins in Effect:</span>
+                        <input id="l16_b1"  class="narrow" type="text" placeholder="TB#">
+                        <input id="l16_b2"  class="narrow" type="text" placeholder="TB#">
+                        <input id="l16_b3"  class="narrow" type="text" placeholder="TB#">
+                        <input id="l16_b4"  class="narrow" type="text" placeholder="TB#">
+                        <input id="l16_b5"  class="narrow" type="text" placeholder="TB#">
+                        <input id="l16_b6"  class="narrow" type="text" placeholder="TB#">
+                        <input id="l16_b7"  class="narrow" type="text" placeholder="TB#">
+                        <input id="l16_b8"  class="narrow" type="text" placeholder="TB#">
+                        <input id="l16_b9"  class="narrow" type="text" placeholder="TB#">
+                        <input id="l16_b10" class="narrow" type="text" placeholder="TB#">
+                        <input id="l16_b11" class="narrow" type="text" placeholder="TB#">
+                        <input id="l16_b12" class="narrow" type="text" placeholder="TB#">
+                        <input id="l16_b13" class="narrow" type="text" placeholder="TB#">
+                        <input id="l16_b14" class="narrow" type="text" placeholder="TB#">
+                        <input id="l16_b15" class="narrow" type="text" placeholder="TB#">
+                        <input id="l16_b16" class="narrow" type="text" placeholder="TB#">
+                    </div>
+                </div>
+
+                <div class="line-row">
+                    <div class="line-num">17.</div>
+                    <input class="line-check" type="checkbox" id="l17_on">
+                    <div class="line-text">
+                        <span class="txt">Other Specific Instructions:</span>
+                        <textarea id="l17_text" maxlength="200" rows="3" placeholder="Up to 200 characters..." style="width:100%;resize:vertical;"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer fields -->
+            <div class="warrant-footer-box">
+                <div class="warrant-footer-row">
+                    <span class="ftr-label">OK</span>
+                    <input type="text" id="okTime" class="ftr-narrow" placeholder="HHMM" required>
+                    <span class="ftr-label">M&nbsp;&nbsp;DISPATCHER</span>
+                    <input type="text" id="dispatcher" class="ftr-wide" placeholder="Dispatcher name" required>
+                </div>
+                <div class="warrant-footer-row">
+                    <span class="ftr-label">RELAYED TO</span>
+                    <input type="text" id="relayedTo" class="ftr-wide" placeholder="Name (optional)">
+                    <span class="ftr-label" style="margin-left:12px;">COPIED BY</span>
+                    <input type="text" id="copiedBy" class="ftr-wide" placeholder="Name" required>
+                </div>
+                <div class="warrant-footer-row">
+                    <span class="ftr-label">LIMITS REPORTED CLEAR AT</span>
+                    <input type="text" id="limitsClearAt" class="ftr-wide" placeholder="Location (optional)">
+                    <span class="ftr-label" style="margin-left:12px;">BY</span>
+                    <input type="text" id="limitsClearBy" class="ftr-wide" placeholder="Name (optional)">
+                </div>
+                <div class="field-hint" style="margin-top:6px;">(Mark "X" in box for each item instructed)</div>
+            </div>
+
+            <div class="button-bar">
+                <button type="submit" class="success">✓ Create Warrant</button>
+                <button type="button" onclick="clearForm()">✗ Clear Form</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="container">
+        <div class="form-header">TRACK WARRANTS</div>
+        <div style="margin-bottom: 15px;">
+            <button onclick="loadAllWarrants()" class="info">Load All Warrants</button>
+            <button onclick="loadActiveWarrants()" class="success">Load Active Only</button>
+            <button onclick="clearWarrants()" class="danger">Clear Display</button>
+        </div>
+        <div id="warrantList"></div>
+    </div>
+
+    <div class="container">
+        <div class="form-header">API RESPONSE</div>
+        <div id="response">Response will appear here...</div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/warrants';
+
+        function v(id) {
+            const el = document.getElementById(id);
+            return el ? el.value.trim() : '';
+        }
+
+        function checked(id) {
+            const el = document.getElementById(id);
+            return !!(el && el.checked);
+        }
+
+        function lineNumberFromId(id) {
+            const m = /^l(\d+)_/.exec(id || '');
+            return m ? m[1] : null;
+        }
+
+        function syncLineChecksFromData() {
+            const inputs = document.querySelectorAll('.line-text input[id^="l"]');
+            inputs.forEach((input) => {
+                const lineNum = lineNumberFromId(input.id);
+                if (!lineNum) return;
+                if (input.value.trim() !== '') {
+                    const check = document.getElementById(`l${lineNum}_on`);
+                    if (check) check.checked = true;
+                }
+            });
+        }
+
+        function attachLineAutoCheckHandlers() {
+            const inputs = document.querySelectorAll('.line-text input[id^="l"]');
+            inputs.forEach((lineInput) => {
+                lineInput.addEventListener('input', () => {
+                    const lineNum = lineNumberFromId(lineInput.id);
+                    if (!lineNum) return;
+                    if (lineInput.value.trim() !== '') {
+                        const check = document.getElementById(`l${lineNum}_on`);
+                        if (check) check.checked = true;
+                    }
+                });
+            });
+        }
+
+        function deriveFromLineDriven() {
+            syncLineChecksFromData();
+
+            const lineValues = {
+                line1Instruction: checked('l1_on') ? `Track Warrant NO. ${v('l1_void_number') || '_____'} is Void.` : null,
+                line2Instruction: checked('l2_on') ? `Proceed from ${v('l2_from') || '_____'} to ${v('l2_to') || '_____'} on ${v('l2_track') || '_____'} Track` : null,
+                line3Instruction: checked('l3_on') ? `Proceed from ${v('l3_from') || '_____'} to ${v('l3_to') || '_____'} on ${v('l3_track') || '_____'} Track` : null,
+                line4Instruction: checked('l4_on') ? `Work between ${v('l4_from') || '_____'} and ${v('l4_to') || '_____'} on ${v('l4_track') || '_____'} Track` : null,
+                line5Instruction: checked('l5_on') ? `Not in effect until ${v('l5_until') || '_____'}M` : null,
+                line6Instruction: checked('l6_on') ? `This Authority Expires at ${v('l6_time') || '_____'}M` : null,
+                line7Instruction: checked('l7_on') ? `Not in effect until after arrival of ${v('l7_train') || '_____'} at ${v('l7_at') || '_____'}` : null,
+                line8Instruction: checked('l8_on') ? `Hold Main Track at Last Named Point.` : null,
+                line9Instruction: checked('l9_on') ? `Do Not Foul Limints ahead of ${v('l9_ahead') || '_____'}.` : null,
+                line10Instruction: checked('l10_on') ? `Clear Main Track at Last Named Point.` : null,
+                line11Instruction: checked('l11_on') ? `Between ${v('l11_from') || '_____'} and ${v('l11_to') || '_____'} Make All Movements at restricted speed. Limits occupied by train or engine.` : null,
+                line12Instruction: checked('l12_on') ? `Between ${v('l12_from') || '_____'} and ${v('l12_to') || '_____'} Make All Movements at restricted speed and stop short of Men or Machines fouling track.` : null,
+                line13Instruction: checked('l13_on') ? `Do not exceed ${v('l13_mph') || '_____'} MPH between ${v('l13_from') || '_____'} and ${v('l13_to') || '_____'}` : null,
+                line14Instruction: checked('l14_on') ? `Do not exceed ${v('l14_mph') || '_____'} MPH between ${v('l14_from') || '_____'} and ${v('l14_to') || '_____'}` : null,
+                line15Instruction: checked('l15_on') ? `Protection as prescribed by Rule 99 not required.` : null,
+                line16Instruction: checked('l16_on') ? `Track Bulletins in Effect: ${[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16].map(n => v('l16_b'+n)).filter(Boolean).join(', ')}` : null,
+                line17Instruction: checked('l17_on') ? `Other Specific Instructions: ${v('l17_text') || '_____'}` : null
+            };
+
+            const warrantDate = v('warrantDate') || new Date().toISOString().slice(0, 10);
+            const warrantNumber = parseInt(v('warrantNumber') || '1');
+            const warrantId = warrantDate + '-' + warrantNumber;
+
+            return {
+                warrantId,
+                warrantNumber,
+                warrantDate,
+                trainId: v('trainId'),
+                trainCrew: v('trainCrew') || null,
+                location: v('location') || null,
+                startingLocation: v('l2_from') || null,
+                issuedBy: v('dispatcher') || null,
+                okTime: v('okTime') || null,
+                dispatcher: v('dispatcher') || null,
+                relayedTo: v('relayedTo') || null,
+                copiedBy: v('copiedBy') || null,
+                limitsClearAt: v('limitsClearAt') || null,
+                limitsClearBy: v('limitsClearBy') || null,
+                ...lineValues,
+                issuedDateTime: new Date().toISOString()
+            };
+        }
+
+        function validateWarrant(data) {
+            const errors = [];
+            if (!data.warrantNumber) errors.push('Warrant number is required.');
+            if (!data.warrantDate)   errors.push('Date is required.');
+            if (!data.trainCrew)     errors.push('TO (train crew) is required.');
+            if (!data.location)      errors.push('AT (location) is required.');
+            if (!data.trainId)       errors.push('Train/Engine ID is required.');
+            if (!data.okTime)        errors.push('OK time is required.');
+            if (!data.dispatcher)    errors.push('Dispatcher name is required.');
+            if (!data.copiedBy)      errors.push('Copied By is required.');
+
+            const anyLine = [
+                data.line1Instruction, data.line2Instruction, data.line3Instruction,
+                data.line4Instruction, data.line5Instruction, data.line6Instruction,
+                data.line7Instruction, data.line8Instruction, data.line9Instruction,
+                data.line10Instruction, data.line11Instruction, data.line12Instruction,
+                data.line13Instruction, data.line14Instruction, data.line15Instruction,
+                data.line16Instruction, data.line17Instruction
+            ].some(Boolean);
+            if (!anyLine) errors.push('At least one instruction line must be checked.');
+
+            return errors;
+        }
+
+        function warrantInstructionSummary(w) {
+            const lines = [
+                w.line1Instruction, w.line2Instruction, w.line3Instruction, w.line4Instruction,
+                w.line5Instruction, w.line6Instruction, w.line7Instruction, w.line8Instruction,
+                w.line9Instruction, w.line10Instruction, w.line11Instruction, w.line12Instruction,
+                w.line13Instruction, w.line14Instruction, w.line15Instruction,
+                w.line16Instruction, w.line17Instruction
+            ].filter(Boolean);
+            return lines.length ? lines.join(' | ') : 'None';
+        }
+
+        // Create warrant (line-driven)
+        document.getElementById('createWarrantForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            syncLineChecksFromData();
+            const request = deriveFromLineDriven();
+
+            const errors = validateWarrant(request);
+            if (errors.length > 0) {
+                alert(errors.join('\n'));
+                return;
+            }
+
+            try {
+                const response = await fetch(API_BASE, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(request)
+                });
+
+                const data = await response.json();
+                displayResponse(data);
+
+                if (response.ok) {
+                    alert('Warrant created successfully!');
+                    clearForm();
+                    loadAllWarrants();
+                } else {
+                    alert('Failed to create warrant: ' + (data.message || 'Unknown error'));
+                }
+            } catch (error) {
+                displayResponse({ error: error.message });
+                alert('Error: ' + error.message);
+            }
+        });
+
+        // Load all warrants
+        async function loadAllWarrants() {
+            try {
+                const response = await fetch(API_BASE);
+                const warrants = await response.json();
+                displayResponse(warrants);
+                displayWarrants(warrants);
+            } catch (error) {
+                displayResponse({ error: error.message });
+            }
+        }
+
+        // Load active warrants only
+        async function loadActiveWarrants() {
+            try {
+                const response = await fetch(API_BASE + '/active');
+                const warrants = await response.json();
+                displayResponse(warrants);
+                displayWarrants(warrants);
+            } catch (error) {
+                displayResponse({ error: error.message });
+            }
+        }
+
+        // Complete a warrant
+        async function completeWarrant(warrantId) {
+            if (!confirm(`Mark warrant ${warrantId} as completed?`)) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/${warrantId}/complete`, {
+                    method: 'PUT'
+                });
+                const data = await response.json();
+                displayResponse(data);
+
+                if (response.ok) {
+                    alert('Warrant completed successfully!');
+                    loadAllWarrants();
+                } else {
+                    alert('Failed to complete warrant');
+                }
+            } catch (error) {
+                displayResponse({ error: error.message });
+                alert('Error: ' + error.message);
+            }
+        }
+
+        // Cancel a warrant
+        async function cancelWarrant(warrantId) {
+            if (!confirm(`Cancel warrant ${warrantId}?`)) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/${warrantId}/cancel`, {
+                    method: 'PUT'
+                });
+                const data = await response.json();
+                displayResponse(data);
+
+                if (response.ok) {
+                    alert('Warrant cancelled successfully!');
+                    loadAllWarrants();
+                } else {
+                    alert('Failed to cancel warrant');
+                }
+            } catch (error) {
+                displayResponse({ error: error.message });
+                alert('Error: ' + error.message);
+            }
+        }
+
+        // Delete a warrant
+        async function deleteWarrant(warrantId) {
+            if (!confirm(`Delete warrant ${warrantId}? This cannot be undone.`)) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/${warrantId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    displayResponse({ message: 'Warrant deleted successfully' });
+                    alert('Warrant deleted successfully!');
+                    loadAllWarrants();
+                } else {
+                    alert('Failed to delete warrant');
+                }
+            } catch (error) {
+                displayResponse({ error: error.message });
+                alert('Error: ' + error.message);
+            }
+        }
+
+        // Display warrants in list
+        function displayWarrants(warrants) {
+            const listDiv = document.getElementById('warrantList');
+
+            if (!warrants || warrants.length === 0) {
+                listDiv.innerHTML = '<p style="color: #999; font-style: italic;">No warrants found.</p>';
+                return;
+            }
+
+            listDiv.innerHTML = warrants.map(w => `
+                <div class="warrant-card">
+                    <h3>NO. ${w.warrantNumber || w.warrantId} &mdash; ${w.warrantDate || ''}</h3>
+                    <span class="warrant-status status-${w.status}">${w.status}</span>
+                    <div class="info-row"><span class="info-label">Train/Engine:</span> ${w.trainId}</div>
+                    <div class="info-row"><span class="info-label">To:</span> ${w.trainCrew || 'N/A'}</div>
+                    <div class="info-row"><span class="info-label">At:</span> ${w.location || 'N/A'}</div>
+                    <div class="info-row"><span class="info-label">Dispatcher:</span> ${w.dispatcher || w.issuedBy || 'N/A'}</div>
+                    <div class="info-row"><span class="info-label">OK Time:</span> ${w.okTime || 'N/A'}M</div>
+                    <div class="info-row"><span class="info-label">Copied By:</span> ${w.copiedBy || 'N/A'}</div>
+                    <div class="info-row"><span class="info-label">Instructions:</span> ${warrantInstructionSummary(w)}</div>
+                    <div class="info-row"><span class="info-label">Issued:</span> ${new Date(w.issuedDateTime).toLocaleString()}</div>
+                    <div class="warrant-actions">
+                        <button onclick="viewWarrantForm('${w.warrantId}')" style="background-color: #17a2b8;">📋 View Form</button>
+                        ${w.status === 'ACTIVE' ? `
+                            <button class="success" onclick="completeWarrant('${w.warrantId}')">Complete</button>
+                            <button class="danger" onclick="cancelWarrant('${w.warrantId}')">Cancel</button>
+                        ` : ''}
+                        <button class="danger" onclick="deleteWarrant('${w.warrantId}')">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Display API response
+        function displayResponse(data) {
+            document.getElementById('response').textContent = JSON.stringify(data, null, 2);
+        }
+
+        // View warrant form
+        function viewWarrantForm(warrantId) {
+            window.open(`warrant-form.html?id=${warrantId}`, '_blank');
+        }
+
+        // Clear form
+        function clearForm() {
+            document.getElementById('createWarrantForm').reset();
+            // Keep line 2 default.
+            document.getElementById('l2_on').checked = true;
+        }
+
+        // Clear warrants display
+        function clearWarrants() {
+            document.getElementById('warrantList').innerHTML = '';
+            document.getElementById('response').textContent = 'Response will appear here...';
+        }
+
+        // Load warrants on page load
+        window.addEventListener('load', async () => {
+            clearForm();
+            // Pre-fill today's date
+            document.getElementById('warrantDate').value = new Date().toISOString().slice(0, 10);
+            // Auto-load next warrant number
+            try {
+                const res = await fetch('/api/warrants/next-number');
+                if (res.ok) {
+                    document.getElementById('warrantNumber').value = await res.json();
+                }
+            } catch (e) { /* ignore */ }
+            attachLineAutoCheckHandlers();
+            loadAllWarrants();
+        });
+    </script>
+</body>
+</html>

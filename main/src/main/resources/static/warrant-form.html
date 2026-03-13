@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Warrant</title>
+    <style>
+        @media print {
+            body { margin: 0; padding: 5mm; background: white; }
+            .no-print { display: none !important; }
+            .warrant-form { box-shadow: none !important; page-break-after: always; }
+            body.receipt-mode { padding: 0; font-size: 9pt; }
+            body.receipt-mode .warrant-form {
+                width: 58mm;
+                max-width: 58mm;
+                padding: 2mm 2mm 2mm 4mm;
+                border: none;
+            }
+            body.receipt-mode { }
+            @page { size: 58mm auto; margin: 2mm 2mm 2mm 4mm; }
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 11pt;
+            line-height: 1.3;
+            background-color: #f0f0f0;
+            padding: 10px;
+        }
+
+        .warrant-form {
+            max-width: 8.5in;
+            margin: 0 auto;
+            background: white;
+            padding: 0.25in;
+            border: none;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        }
+
+        .form-header {
+            text-align: center;
+            border-bottom: none;
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+        }
+
+        .form-header h1 {
+            font-size: 20pt;
+            font-weight: bold;
+            letter-spacing: 3px;
+            margin-bottom: 4px;
+        }
+
+        .form-header h2 {
+            font-size: 14pt;
+            margin-bottom: 2px;
+        }
+
+        .form-number {
+            font-size: 12pt;
+            font-weight: bold;
+        }
+
+        .top-section {
+            border: none;
+            padding: 8px 0;
+            margin-bottom: 10px;
+        }
+
+        .top-row {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 6px;
+            gap: 6px;
+        }
+
+        .field-group {
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+            min-width: 0;
+        }
+
+        .field-label {
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .field-value {
+            border-bottom: 1px solid #000;
+            min-width: 100px;
+            padding: 0 4px;
+            font-weight: bold;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .instructions-box {
+            border: none;
+            min-height: 0;
+            padding: 4px 0;
+            margin-bottom: 10px;
+        }
+
+        .instruction-line {
+            display: flex;
+            margin-bottom: 10px;
+            page-break-inside: avoid;
+        }
+
+        .line-number {
+            font-weight: bold;
+            min-width: 28px;
+            flex-shrink: 0;
+        }
+
+        .line-checkbox {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #000;
+            display: inline-block;
+            margin: 0 6px 0 0;
+            flex-shrink: 0;
+            position: relative;
+            top: 2px;
+        }
+
+        .line-checkbox.checked::after {
+            content: 'X';
+            position: absolute;
+            top: -4px;
+            left: 2px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .line-text {
+            flex: 1;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .line-fill {
+            border-bottom: 1px solid #000;
+            display: inline-block;
+            min-width: 60px;
+            padding: 0 4px;
+            font-weight: bold;
+        }
+
+        .bottom-section {
+            border: none;
+            padding: 4px 0;
+            margin-bottom: 10px;
+        }
+
+        .footer-text {
+            text-align: center;
+            font-size: 9pt;
+            font-weight: bold;
+            margin-top: 8px;
+            padding: 4px;
+            border: none;
+        }
+
+        .footer-field-row {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+        }
+
+        .footer-label {
+            font-weight: bold;
+            white-space: nowrap;
+            font-size: 9pt;
+        }
+
+        .footer-value {
+            border-bottom: 1px solid #000;
+            min-width: 80px;
+            padding: 0 4px;
+            font-weight: bold;
+        }
+
+        .no-print {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin: 0 5px;
+        }
+
+        .btn:hover { background: #0056b3; }
+        .btn-secondary { background: #6c757d; }
+        .btn-secondary:hover { background: #545b62; }
+        .btn.active { background: #28a745; }
+        .btn.active:hover { background: #1f7f35; }
+
+        /* ── 58mm receipt mode ── */
+        body.receipt-mode {
+            font-size: 8pt;
+            padding: 0;
+            background: white;
+        }
+
+        body.receipt-mode .warrant-form {
+            width: 58mm;
+            max-width: 58mm;
+            padding: 2mm;
+            border: none;
+            box-shadow: none;
+        }
+
+        body.receipt-mode .form-header {
+            padding-bottom: 2px;
+            margin-bottom: 4px;
+        }
+
+        body.receipt-mode .form-header h1 {
+            font-size: 11pt;
+            letter-spacing: 1px;
+            margin-bottom: 1px;
+        }
+
+        body.receipt-mode .form-header h2 {
+            font-size: 8pt;
+        }
+
+        body.receipt-mode .form-number {
+            font-size: 8pt;
+        }
+
+        body.receipt-mode .top-section,
+        body.receipt-mode .instructions-box,
+        body.receipt-mode .bottom-section {
+            padding: 2px 0;
+            margin-bottom: 4px;
+        }
+
+        body.receipt-mode .top-row {
+            flex-direction: column;
+            gap: 2px;
+            margin-bottom: 2px;
+        }
+
+        body.receipt-mode .field-group {
+            flex-wrap: wrap;
+            gap: 2px;
+        }
+
+        body.receipt-mode .field-value {
+            min-width: 0;
+            white-space: normal;
+            overflow: visible;
+            text-overflow: clip;
+            font-size: 8pt;
+        }
+
+        body.receipt-mode .instruction-line {
+            margin-bottom: 4px;
+        }
+
+        body.receipt-mode .line-number {
+            min-width: 18px;
+            font-size: 8pt;
+        }
+
+        body.receipt-mode .line-checkbox {
+            width: 11px;
+            height: 11px;
+            margin-right: 3px;
+            border-width: 1px;
+        }
+
+        body.receipt-mode .line-checkbox.checked::after {
+            top: -4px;
+            left: 1px;
+            font-size: 12px;
+        }
+
+        body.receipt-mode .line-text {
+            font-size: 8pt;
+            word-break: break-word;
+        }
+
+        body.receipt-mode .line-fill {
+            min-width: 30px;
+            font-size: 8pt;
+        }
+
+        body.receipt-mode .footer-field-row {
+            flex-direction: column;
+            gap: 2px;
+            margin-bottom: 3px;
+        }
+
+        body.receipt-mode .footer-label {
+            font-size: 7pt;
+        }
+
+        body.receipt-mode .footer-value {
+            min-width: 0;
+            width: 100%;
+            font-size: 8pt;
+        }
+
+        body.receipt-mode .footer-text {
+            font-size: 7pt;
+            margin-top: 3px;
+            padding: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="no-print">
+        <button class="btn btn-secondary" onclick="window.history.back()">← Back to List</button>
+        <button class="btn btn-secondary" id="standardPreviewBtn" onclick="setPrintMode('standard')">Standard Preview</button>
+        <button class="btn btn-secondary" id="receiptPreviewBtn" onclick="setPrintMode('receipt')">58mm Preview</button>
+        <button class="btn" onclick="printInMode('standard')">🖨️ Print Warrant</button>
+        <button class="btn" onclick="printInMode('receipt')">🧾 Print 58mm Receipt</button>
+    </div>
+
+    <div class="warrant-form" id="warrantForm">
+        <div class="form-header">
+            <h1>TRACK WARRANT</h1>
+            <h2>TRAINBEANS RAILROAD</h2>
+            <div class="form-number">
+                <span class="field-label">NO</span>
+                <span id="warrantNumber" class="field-value" style="min-width:40px; display:inline-block;">________</span>
+                <span style="margin: 0 10px;"></span>
+                <span id="warrantDate" class="field-value" style="min-width:80px; display:inline-block;">__________</span>
+            </div>
+        </div>
+
+        <div class="top-section">
+            <div class="top-row">
+                <div class="field-group" style="flex:1;">
+                    <span class="field-label">TO:</span>
+                    <span class="field-value" id="trainCrew" style="flex:1; white-space:normal; overflow:visible;">_________________</span>
+                </div>
+                <div class="field-group" style="flex:1;">
+                    <span class="field-label">AT:</span>
+                    <span class="field-value" id="location" style="flex:1; white-space:normal; overflow:visible;">_________________</span>
+                </div>
+            </div>
+            <div class="top-row">
+                <div class="field-group">
+                    <span class="field-label">TRAIN/ENGINE:</span>
+                    <span class="field-value" id="trainId">___________</span>
+                </div>
+                <div class="field-group">
+                    <span class="field-label">TIME:</span>
+                    <span class="field-value" id="issueTime">_______</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="instructions-box" id="instructionsBox"></div>
+
+        <div class="bottom-section">
+            <div class="footer-field-row">
+                <span class="footer-label">OK</span>
+                <span class="footer-value" id="okTime" style="min-width:50px;">_______</span>
+                <span class="footer-label">M&nbsp;DISPATCHER</span>
+                <span class="footer-value" id="dispatcher" style="flex:1; min-width:80px;">_______________________</span>
+            </div>
+            <div class="footer-field-row">
+                <span class="footer-label">RELAYED TO</span>
+                <span class="footer-value" id="relayedTo" style="flex:1; min-width:80px;">_______________________</span>
+            </div>
+            <div class="footer-field-row">
+                <span class="footer-label">COPIED BY</span>
+                <span class="footer-value" id="copiedBy" style="flex:1; min-width:80px;">_______________________</span>
+            </div>
+            <div class="footer-field-row">
+                <span class="footer-label">LIMITS REPORTED CLEAR AT</span>
+                <span class="footer-value" id="limitsClearAt" style="flex:1; min-width:60px;">_______________________</span>
+            </div>
+            <div class="footer-field-row">
+                <span class="footer-label">BY</span>
+                <span class="footer-value" id="limitsClearBy" style="flex:1; min-width:80px;">_______________________</span>
+            </div>
+        </div>
+
+        <div class="footer-text">
+            (Mark "X" in box for each item instructed)
+        </div>
+    </div>
+
+    <script>
+        // Canonical line templates (must match line-driven entry form).
+        const WARRANT_LINES = [
+            { num: 1, text: "Track Warrant NO. <span class='line-fill'>_______</span> is Void." },
+            { num: 2, text: "Proceed from <span class='line-fill'>_______</span> to <span class='line-fill'>_______</span> on <span class='line-fill'>_______</span> Track" },
+            { num: 3, text: "Proceed from <span class='line-fill'>_______</span> to <span class='line-fill'>_______</span> on <span class='line-fill'>_______</span> Track" },
+            { num: 4, text: "Work between <span class='line-fill'>_______</span> and <span class='line-fill'>_______</span> on <span class='line-fill'>_______</span> Track" },
+            { num: 5, text: "Not in effect until <span class='line-fill'>____________</span>M" },
+            { num: 6, text: "This Authority Expires at <span class='line-fill'>____________</span>M" },
+            { num: 7, text: "Not in effect until after arrival of <span class='line-fill'>_______</span> at <span class='line-fill'>_______</span>" },
+            { num: 8, text: "Hold Main Track at Last Named Point." },
+            { num: 9, text: "Do Not Foul Limints ahead of <span class='line-fill'>_______</span>." },
+            { num: 10, text: "Clear Main Track at Last Named Point." },
+            { num: 11, text: "Between <span class='line-fill'>_______</span> and <span class='line-fill'>_______</span> Make All Movements at restricted speed. Limits occupied by train or engine." },
+            { num: 12, text: "Between <span class='line-fill'>_______</span> and <span class='line-fill'>_______</span> Make All Movements at restricted speed and stop short of Men or Machines fouling track." },
+            { num: 13, text: "Do not exceed <span class='line-fill'>_______</span> MPH between <span class='line-fill'>_______</span> and <span class='line-fill'>_______</span>" },
+            { num: 14, text: "Do not exceed <span class='line-fill'>_______</span> MPH between <span class='line-fill'>_______</span> and <span class='line-fill'>_______</span>" },
+            { num: 15, text: "Protection as prescribed by Rule 99 not required." },
+            { num: 16, text: "Track Bulletins in Effect: <span class='line-fill'>_______</span>" },
+            { num: 17, text: "Other Specific Instructions: <span class='line-fill'>_______</span>" }
+        ];
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const warrantId = urlParams.get('id');
+        const requestedPrintMode = urlParams.get('printMode') || 'standard';
+        let currentPrintMode = 'standard';
+
+        setPrintMode(requestedPrintMode);
+
+        if (warrantId) {
+            loadWarrant(warrantId);
+        } else {
+            renderBlankForm();
+        }
+
+        function setPrintMode(mode) {
+            currentPrintMode = mode === 'receipt' ? 'receipt' : 'standard';
+            document.body.classList.toggle('receipt-mode', currentPrintMode === 'receipt');
+            document.body.setAttribute('data-print-mode', currentPrintMode);
+            applyPageSizeStyle();
+            updatePreviewButtons();
+        }
+
+        function updatePreviewButtons() {
+            const standardBtn = document.getElementById('standardPreviewBtn');
+            const receiptBtn = document.getElementById('receiptPreviewBtn');
+            if (standardBtn) {
+                standardBtn.classList.toggle('active', currentPrintMode === 'standard');
+            }
+            if (receiptBtn) {
+                receiptBtn.classList.toggle('active', currentPrintMode === 'receipt');
+            }
+        }
+
+        function applyPageSizeStyle() {
+            let styleEl = document.getElementById('pageSizeStyle');
+            if (!styleEl) {
+                styleEl = document.createElement('style');
+                styleEl.id = 'pageSizeStyle';
+                document.head.appendChild(styleEl);
+            }
+
+            styleEl.textContent = currentPrintMode === 'receipt'
+                ? '@page { size: 58mm auto; margin: 2mm 2mm 2mm 4mm; }'
+                : '@page { size: auto; margin: 5mm; }';
+        }
+
+        function printInMode(mode) {
+            setPrintMode(mode);
+            window.print();
+        }
+
+        function renderBlankForm() {
+            const box = document.getElementById('instructionsBox');
+            box.innerHTML = WARRANT_LINES.map(line => `
+                <div class="instruction-line">
+                    <span class="line-number">${line.num}.</span>
+                    <span class="line-checkbox"></span>
+                    <span class="line-text">${line.text}</span>
+                </div>
+            `).join('');
+        }
+
+        function fillHtml(text) {
+            return `<span class='line-fill'>${(text || '_______').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>`;
+        }
+
+        function fallbackLine(num, warrant) {
+            const from = warrant.startingLocation || '_______';
+            switch (num) {
+                case 2:
+                    return `Proceed from ${fillHtml(from)} to ${fillHtml('_______')} on ${fillHtml('_______')} Track`;
+                default:
+                    return WARRANT_LINES.find(x => x.num === num).text;
+            }
+        }
+
+        async function loadWarrant(id) {
+            try {
+                const response = await fetch(`/api/warrants/${id}`);
+                if (!response.ok) throw new Error('Warrant not found');
+
+                const warrant = await response.json();
+                displayWarrant(warrant);
+            } catch (error) {
+                console.error('Error loading warrant:', error);
+                document.getElementById('warrantForm').innerHTML =
+                    '<div style="text-align: center; padding: 50px;"><h2>Error loading warrant: ' + error.message + '</h2></div>';
+            }
+        }
+
+        function displayWarrant(warrant) {
+            // Header: NO and date
+            document.getElementById('warrantNumber').textContent = warrant.warrantNumber || warrant.warrantId || '________';
+            document.getElementById('warrantDate').textContent = warrant.warrantDate || '';
+            document.getElementById('trainCrew').textContent = warrant.trainCrew || '_________________';
+            document.getElementById('trainId').textContent = warrant.trainId || '___________';
+            document.getElementById('location').textContent = warrant.location || warrant.startingLocation || '_________________';
+
+            if (warrant.issuedDateTime) {
+                const issued = new Date(warrant.issuedDateTime);
+                document.getElementById('issueTime').textContent = issued.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            }
+
+            // Footer fields
+            document.getElementById('okTime').textContent = warrant.okTime || '_______';
+            document.getElementById('dispatcher').textContent = warrant.dispatcher || warrant.issuedBy || '_______________________';
+            document.getElementById('relayedTo').textContent = warrant.relayedTo || '_______________________';
+            document.getElementById('copiedBy').textContent = warrant.copiedBy || '_______________________';
+            document.getElementById('limitsClearAt').textContent = warrant.limitsClearAt || '_______________________';
+            document.getElementById('limitsClearBy').textContent = warrant.limitsClearBy || '_______________________';
+
+
+            const box = document.getElementById('instructionsBox');
+
+            const lineFieldMap = {
+                1: warrant.line1Instruction,
+                2: warrant.line2Instruction,
+                3: warrant.line3Instruction,
+                4: warrant.line4Instruction,
+                5: warrant.line5Instruction,
+                6: warrant.line6Instruction,
+                7: warrant.line7Instruction,
+                8: warrant.line8Instruction,
+                9: warrant.line9Instruction,
+                10: warrant.line10Instruction,
+                11: warrant.line11Instruction,
+                12: warrant.line12Instruction,
+                13: warrant.line13Instruction,
+                14: warrant.line14Instruction,
+                15: warrant.line15Instruction,
+                16: warrant.line16Instruction,
+                17: warrant.line17Instruction
+            };
+
+            const lines = WARRANT_LINES.map(t => {
+                const structuredText = (lineFieldMap[t.num] || '').trim();
+                const fallbackText = fallbackLine(t.num, warrant);
+                const text = structuredText || fallbackText;
+
+                // Fixed-text rows should only be checked when explicitly set in saved line fields.
+                const fixedTextLineRequiresExplicitCheck = t.num === 8 || t.num === 10 || t.num === 15;
+                const hasRealData = !text.includes("_______");
+                const checked = !!structuredText
+                    || (t.num === 2 && !structuredText)
+                    || (!fixedTextLineRequiresExplicitCheck && hasRealData);
+
+                return { num: t.num, checked, text };
+            });
+
+            box.innerHTML = lines.map(line => `
+                <div class="instruction-line">
+                    <span class="line-number">${line.num}.</span>
+                    <span class="line-checkbox ${line.checked ? 'checked' : ''}"></span>
+                    <span class="line-text">${line.text}</span>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
