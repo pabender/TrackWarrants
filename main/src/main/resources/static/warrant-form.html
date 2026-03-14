@@ -428,7 +428,7 @@
             <div class="footer-field-row">
                 <span class="footer-label">OK</span>
                 <span class="footer-value" id="okTime" style="min-width:50px;">_______</span>
-                <span class="footer-label">M&nbsp;DISPATCHER</span>
+                <span class="footer-label">DISPATCHER</span>
                 <span class="footer-value" id="dispatcher" style="flex:1; min-width:80px;">_______________________</span>
             </div>
             <div class="footer-field-row">
@@ -461,8 +461,8 @@
             { num: 2, text: "Proceed from <span class='line-fill'>_______</span> to <span class='line-fill'>_______</span> on <span class='line-fill'>_______</span> Track" },
             { num: 3, text: "Proceed from <span class='line-fill'>_______</span> to <span class='line-fill'>_______</span> on <span class='line-fill'>_______</span> Track" },
             { num: 4, text: "Work between <span class='line-fill'>_______</span> and <span class='line-fill'>_______</span> on <span class='line-fill'>_______</span> Track" },
-            { num: 5, text: "Not in effect until <span class='line-fill'>____________</span>M" },
-            { num: 6, text: "This Authority Expires at <span class='line-fill'>____________</span>M" },
+            { num: 5, text: "Not in effect until <span class='line-fill'>____________</span>" },
+            { num: 6, text: "This Authority Expires at <span class='line-fill'>____________</span>" },
             { num: 7, text: "Not in effect until after arrival of <span class='line-fill'>_______</span> at <span class='line-fill'>_______</span>" },
             { num: 8, text: "Hold Main Track at Last Named Point." },
             { num: 9, text: "Do Not Foul Limints ahead of <span class='line-fill'>_______</span>." },
@@ -552,9 +552,9 @@
                 case 4:  return warrant.line4From
                     ? `Work between ${fillHtml(warrant.line4From)} and ${fillHtml(warrant.line4To)} on ${fillHtml(warrant.line4Track)} Track` : null;
                 case 5:  return warrant.line5Until
-                    ? `Not in effect until ${fillHtml(warrant.line5Until)}M` : null;
+                    ? `Not in effect until ${fillHtml(warrant.line5Until)}` : null;
                 case 6:  return warrant.line6Time
-                    ? `This Authority Expires at ${fillHtml(warrant.line6Time)}M` : null;
+                    ? `This Authority Expires at ${fillHtml(warrant.line6Time)}` : null;
                 case 7:  return warrant.line7Train
                     ? `Not in effect until after arrival of ${fillHtml(warrant.line7Train)} at ${fillHtml(warrant.line7At)}` : null;
                 case 8:  return warrant.line8Checked

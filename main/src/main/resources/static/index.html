@@ -496,8 +496,7 @@
                     <input class="line-check" type="checkbox" id="l5_on">
                     <div class="line-text">
                         <span class="txt">Not in effect until</span>
-                        <input id="l5_until" class="narrow" type="text" placeholder="HHMM">
-                        <span class="txt">M</span>
+                        <input id="l5_until" class="narrow" type="text" placeholder="HHMM or HH:MM">
                     </div>
                 </div>
 
@@ -506,8 +505,7 @@
                     <input class="line-check" type="checkbox" id="l6_on">
                     <div class="line-text">
                         <span class="txt">This Authority Expires at</span>
-                        <input id="l6_time" class="narrow" type="text" placeholder="HH:MM">
-                        <span class="txt">M</span>
+                        <input id="l6_time" class="narrow" type="text" placeholder="HHMM or HH:MM">
                     </div>
                 </div>
 
@@ -644,8 +642,8 @@
             <div class="warrant-footer-box">
                 <div class="warrant-footer-row">
                     <span class="ftr-label">OK</span>
-                    <input type="text" id="okTime" class="ftr-narrow" placeholder="HHMM" required>
-                    <span class="ftr-label">M&nbsp;&nbsp;DISPATCHER</span>
+                    <input type="text" id="okTime" class="ftr-narrow" placeholder="HHMM or HH:MM" required>
+                    <span class="ftr-label">DISPATCHER</span>
                     <input type="text" id="dispatcher" class="ftr-wide" placeholder="Dispatcher name" required>
                 </div>
                 <div class="warrant-footer-row">
@@ -698,6 +696,18 @@
             return !!(el && el.checked);
         }
 
+        function normalizeTime(val) {
+            const s = (val || '').trim();
+            if (/^\d{4}$/.test(s)) {
+                const hh = parseInt(s.slice(0, 2), 10);
+                const mm = parseInt(s.slice(2), 10);
+                if (hh <= 23 && mm <= 59) {
+                    return s.slice(0, 2) + ':' + s.slice(2);
+                }
+            }
+            return s;
+        }
+
         function lineNumberFromId(id) {
             const m = /^l(\d+)_/.exec(id || '');
             return m ? m[1] : null;
@@ -712,6 +722,15 @@
                     const check = document.getElementById(`l${lineNum}_on`);
                     if (check) check.checked = true;
                 }
+            });
+        }
+
+        function attachTimeNormalizationHandlers() {
+            ['l5_until', 'l6_time', 'okTime'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('blur', () => {
+                    el.value = normalizeTime(el.value);
+                });
             });
         }
 
@@ -743,8 +762,8 @@
                 line4From:        checked('l4_on')  ? v('l4_from')  || null : null,
                 line4To:          checked('l4_on')  ? v('l4_to')    || null : null,
                 line4Track:       checked('l4_on')  ? v('l4_track') || null : null,
-                line5Until:       checked('l5_on')  ? v('l5_until') || null : null,
-                line6Time:        checked('l6_on')  ? v('l6_time')  || null : null,
+                line5Until:       checked('l5_on')  ? normalizeTime(v('l5_until')) || null : null,
+                line6Time:        checked('l6_on')  ? normalizeTime(v('l6_time'))  || null : null,
                 line7Train:       checked('l7_on')  ? v('l7_train') || null : null,
                 line7At:          checked('l7_on')  ? v('l7_at')    || null : null,
                 line8Checked:     checked('l8_on')  ? true : null,
@@ -778,7 +797,7 @@
                 location: v('location') || null,
                 startingLocation: v('l2_from') || null,
                 issuedBy: v('dispatcher') || null,
-                okTime: v('okTime') || null,
+                okTime: normalizeTime(v('okTime')) || null,
                 dispatcher: v('dispatcher') || null,
                 relayedTo: v('relayedTo') || null,
                 copiedBy: v('copiedBy') || null,
@@ -818,8 +837,8 @@
             if (w.line2From)        parts.push(`Proceed: ${w.line2From} → ${w.line2To || '?'}`);
             if (w.line3From)        parts.push(`Proceed: ${w.line3From} → ${w.line3To || '?'}`);
             if (w.line4From)        parts.push(`Work: ${w.line4From} – ${w.line4To || '?'}`);
-            if (w.line5Until)       parts.push(`Not until: ${w.line5Until}M`);
-            if (w.line6Time)        parts.push(`Expires: ${w.line6Time}M`);
+            if (w.line5Until)       parts.push(`Not until: ${w.line5Until}`);
+            if (w.line6Time)        parts.push(`Expires: ${w.line6Time}`);
             if (w.line7Train)       parts.push(`After: ${w.line7Train} at ${w.line7At || '?'}`);
             if (w.line8Checked)     parts.push('Hold Main Track');
             if (w.line9Ahead)       parts.push(`Don't Foul: ${w.line9Ahead}`);
@@ -1026,7 +1045,7 @@
                     <div class="info-row"><span class="info-label">To:</span> ${w.trainCrew || 'N/A'}</div>
                     <div class="info-row"><span class="info-label">At:</span> ${w.location || 'N/A'}</div>
                     <div class="info-row"><span class="info-label">Dispatcher:</span> ${w.dispatcher || w.issuedBy || 'N/A'}</div>
-                    <div class="info-row"><span class="info-label">OK Time:</span> ${w.okTime || 'N/A'}M</div>
+                    <div class="info-row"><span class="info-label">OK Time:</span> ${w.okTime || 'N/A'}</div>
                     <div class="info-row"><span class="info-label">Copied By:</span> ${w.copiedBy || 'N/A'}</div>
                     <div class="info-row"><span class="info-label">Instructions:</span> ${warrantInstructionSummary(w)}</div>
                     <div class="info-row"><span class="info-label">Issued:</span> ${new Date(w.issuedDateTime).toLocaleString()}</div>
@@ -1079,6 +1098,7 @@
                 }
             } catch (e) { /* ignore */ }
             attachLineAutoCheckHandlers();
+            attachTimeNormalizationHandlers();
             loadAllWarrants();
         });
     </script>
