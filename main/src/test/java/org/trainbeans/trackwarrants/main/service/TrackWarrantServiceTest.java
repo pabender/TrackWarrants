@@ -212,20 +212,6 @@ class TrackWarrantServiceTest {
     }
 
     @Test
-    @DisplayName("cancelWarrant - Should cancel a warrant")
-    void testCancelWarrant() {
-        when(repository.findByWarrantId("TW-TEST-001")).thenReturn(Optional.of(testWarrant));
-        when(transitionPolicy.isAllowed(TrackWarrant.WarrantStatus.ACTIVE, TrackWarrant.WarrantStatus.CANCELLED)).thenReturn(true);
-        when(repository.save(any(TrackWarrant.class))).thenReturn(testWarrant);
-
-        TrackWarrant result = service.cancelWarrant("TW-TEST-001");
-
-        assertThat(result).isNotNull();
-        verify(repository).findByWarrantId("TW-TEST-001");
-        verify(repository).save(any(TrackWarrant.class));
-    }
-
-    @Test
     @DisplayName("updateWarrantStatus - Should update status successfully")
     void testUpdateWarrantStatus() {
         when(repository.findByWarrantId("TW-TEST-001")).thenReturn(Optional.of(testWarrant));

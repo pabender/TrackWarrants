@@ -25,11 +25,6 @@ public interface TrackWarrantCommandUseCase {
     TrackWarrant updateWarrantStatus(String warrantId, TrackWarrant.WarrantStatus status);
 
     /**
-     * Cancel a track warrant.
-     */
-    TrackWarrant cancelWarrant(String warrantId);
-
-    /**
      * Delete a track warrant by warrant ID.
      */
     void deleteWarrant(String warrantId);

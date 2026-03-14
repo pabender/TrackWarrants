@@ -137,7 +137,6 @@ public class TrackWarrant {
     public enum WarrantStatus {
         ACTIVE,
         EXPIRED,
-        CANCELLED,
         VOID
     }
 }
