@@ -87,7 +87,7 @@ class TrackWarrantControllerIntegrationTest {
     void testGetAllWarrants() throws Exception {
         // Create test data
         createTestWarrant("TW-001", "TRAIN-001", TrackWarrant.WarrantStatus.ACTIVE);
-        createTestWarrant("TW-002", "TRAIN-002", TrackWarrant.WarrantStatus.COMPLETED);
+        createTestWarrant("TW-002", "TRAIN-002", TrackWarrant.WarrantStatus.VOID);
 
         mockMvc.perform(get("/api/warrants"))
             .andExpect(status().isOk())
@@ -119,7 +119,7 @@ class TrackWarrantControllerIntegrationTest {
     @DisplayName("GET /api/warrants/active - Should retrieve only active warrants")
     void testGetActiveWarrants() throws Exception {
         createTestWarrant("TW-ACTIVE-001", "TRAIN-001", TrackWarrant.WarrantStatus.ACTIVE);
-        createTestWarrant("TW-COMPLETED-001", "TRAIN-002", TrackWarrant.WarrantStatus.COMPLETED);
+        createTestWarrant("TW-VOID-001", "TRAIN-002", TrackWarrant.WarrantStatus.VOID);
         createTestWarrant("TW-ACTIVE-002", "TRAIN-003", TrackWarrant.WarrantStatus.ACTIVE);
 
         mockMvc.perform(get("/api/warrants/active"))
@@ -133,7 +133,7 @@ class TrackWarrantControllerIntegrationTest {
     @DisplayName("GET /api/warrants/train/{trainId} - Should retrieve warrants for specific train")
     void testGetWarrantsByTrainId() throws Exception {
         createTestWarrant("TW-001", "TRAIN-777", TrackWarrant.WarrantStatus.ACTIVE);
-        createTestWarrant("TW-002", "TRAIN-777", TrackWarrant.WarrantStatus.COMPLETED);
+        createTestWarrant("TW-002", "TRAIN-777", TrackWarrant.WarrantStatus.VOID);
         createTestWarrant("TW-003", "TRAIN-888", TrackWarrant.WarrantStatus.ACTIVE);
 
         mockMvc.perform(get("/api/warrants/train/TRAIN-777"))
@@ -144,14 +144,14 @@ class TrackWarrantControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("PUT /api/warrants/{warrantId}/complete - Should mark warrant as completed")
+    @DisplayName("PUT /api/warrants/{warrantId}/complete - Should mark warrant as void")
     void testCompleteWarrant() throws Exception {
         createTestWarrant("TW-COMPLETE-001", "TRAIN-123", TrackWarrant.WarrantStatus.ACTIVE);
 
         mockMvc.perform(put("/api/warrants/TW-COMPLETE-001/complete"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.warrantId").value("TW-COMPLETE-001"))
-            .andExpect(jsonPath("$.status").value("COMPLETED"));
+            .andExpect(jsonPath("$.status").value("VOID"));
     }
 
     @Test
@@ -240,12 +240,12 @@ class TrackWarrantControllerIntegrationTest {
         // Step 3: Complete
         mockMvc.perform(put("/api/warrants/TW-WORKFLOW-001/complete"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.status").value("COMPLETED"));
+            .andExpect(jsonPath("$.status").value("VOID"));
 
-        // Step 4: Verify completed
+        // Step 4: Verify voided
         mockMvc.perform(get("/api/warrants/TW-WORKFLOW-001"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.status").value("COMPLETED"));
+            .andExpect(jsonPath("$.status").value("VOID"));
     }
 
     @Test
@@ -353,6 +353,34 @@ class TrackWarrantControllerIntegrationTest {
             .andExpect(jsonPath("$.status").value("ACTIVE"))
             .andExpect(jsonPath("$.createdDateTime").exists())
             .andExpect(jsonPath("$.lastModifiedDateTime").exists());
+    }
+
+    @Test
+    @DisplayName("PUT /api/warrants/{warrantId}/limits-clear - Should record limits clear and void warrant")
+    void testRecordLimitsClear() throws Exception {
+        createTestWarrant("TW-LIMITS-001", "TRAIN-555", TrackWarrant.WarrantStatus.ACTIVE);
+
+        String body = "{\"limitsClearAt\": \"NORTH YARD\", \"limitsClearBy\": \"CONDUCTOR SMITH\"}";
+
+        mockMvc.perform(put("/api/warrants/TW-LIMITS-001/limits-clear")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.warrantId").value("TW-LIMITS-001"))
+            .andExpect(jsonPath("$.status").value("VOID"))
+            .andExpect(jsonPath("$.limitsClearAt").value("NORTH YARD"))
+            .andExpect(jsonPath("$.limitsClearBy").value("CONDUCTOR SMITH"));
+    }
+
+    @Test
+    @DisplayName("PUT /api/warrants/{warrantId}/limits-clear - Should return 404 for non-existent warrant")
+    void testRecordLimitsClearNotFound() throws Exception {
+        String body = "{\"limitsClearAt\": \"NORTH YARD\", \"limitsClearBy\": \"CONDUCTOR SMITH\"}";
+
+        mockMvc.perform(put("/api/warrants/NON-EXISTENT/limits-clear")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body))
+            .andExpect(status().isNotFound());
     }
 
     private void createTestWarrant(String warrantId, String trainId, TrackWarrant.WarrantStatus status) {

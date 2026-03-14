@@ -186,10 +186,10 @@ class TrackWarrantServiceTest {
     }
 
     @Test
-    @DisplayName("completeWarrant - Should mark warrant as completed")
+    @DisplayName("completeWarrant - Should mark warrant as void")
     void testCompleteWarrant() {
         when(repository.findByWarrantId("TW-TEST-001")).thenReturn(Optional.of(testWarrant));
-        when(transitionPolicy.isAllowed(TrackWarrant.WarrantStatus.ACTIVE, TrackWarrant.WarrantStatus.COMPLETED)).thenReturn(true);
+        when(transitionPolicy.isAllowed(TrackWarrant.WarrantStatus.ACTIVE, TrackWarrant.WarrantStatus.VOID)).thenReturn(true);
         when(repository.save(any(TrackWarrant.class))).thenReturn(testWarrant);
 
         TrackWarrant result = service.completeWarrant("TW-TEST-001");
@@ -261,5 +261,31 @@ class TrackWarrantServiceTest {
             .hasMessageContaining("Warrant not found");
 
         verify(repository, never()).delete(any(TrackWarrant.class));
+    }
+
+    @Test
+    @DisplayName("recordLimitsClear - Should record limits and mark warrant as void")
+    void testRecordLimitsClear() {
+        when(repository.findByWarrantId("TW-TEST-001")).thenReturn(Optional.of(testWarrant));
+        when(transitionPolicy.isAllowed(TrackWarrant.WarrantStatus.ACTIVE, TrackWarrant.WarrantStatus.VOID)).thenReturn(true);
+        when(repository.save(any(TrackWarrant.class))).thenReturn(testWarrant);
+
+        TrackWarrant result = service.recordLimitsClear("TW-TEST-001", "NORTH YARD", "CONDUCTOR SMITH");
+
+        assertThat(result).isNotNull();
+        verify(repository).findByWarrantId("TW-TEST-001");
+        verify(repository).save(any(TrackWarrant.class));
+    }
+
+    @Test
+    @DisplayName("recordLimitsClear - Should throw exception when warrant not found")
+    void testRecordLimitsClearNotFound() {
+        when(repository.findByWarrantId("NON-EXISTENT")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.recordLimitsClear("NON-EXISTENT", "NORTH YARD", "CONDUCTOR SMITH"))
+            .isInstanceOf(WarrantNotFoundException.class)
+            .hasMessageContaining("Warrant not found");
+
+        verify(repository, never()).save(any(TrackWarrant.class));
     }
 }

@@ -138,6 +138,6 @@ public class TrackWarrant {
         ACTIVE,
         EXPIRED,
         CANCELLED,
-        COMPLETED
+        VOID
     }
 }

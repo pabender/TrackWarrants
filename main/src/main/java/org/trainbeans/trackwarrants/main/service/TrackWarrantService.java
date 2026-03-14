@@ -101,13 +101,13 @@ public class TrackWarrantService implements TrackWarrantUseCase {
     }
 
     /**
-     * Mark a track warrant as completed.
+     * Mark a track warrant as void.
      */
     @Override
     public TrackWarrant completeWarrant(String warrantId) {
-        log.info("Completing track warrant: {}", warrantId);
-        TrackWarrant updated = updateWarrantStatus(warrantId, TrackWarrant.WarrantStatus.COMPLETED);
-        log.info("Track warrant completed: {}", warrantId);
+        log.info("Voiding track warrant: {}", warrantId);
+        TrackWarrant updated = updateWarrantStatus(warrantId, TrackWarrant.WarrantStatus.VOID);
+        log.info("Track warrant voided: {}", warrantId);
         return updated;
     }
 
@@ -137,6 +137,29 @@ public class TrackWarrantService implements TrackWarrantUseCase {
     public TrackWarrant cancelWarrant(String warrantId) {
         log.info("Cancelling track warrant: {}", warrantId);
         return updateWarrantStatus(warrantId, TrackWarrant.WarrantStatus.CANCELLED);
+    }
+
+    /**
+     * Record limits reported clear and mark warrant as void.
+     */
+    public TrackWarrant recordLimitsClear(String warrantId, String limitsClearAt, String limitsClearBy) {
+        log.info("Recording limits clear for warrant: {}", warrantId);
+
+        TrackWarrant warrant = repository.findByWarrantId(warrantId)
+            .orElseThrow(() -> new WarrantNotFoundException(warrantId));
+
+        TrackWarrant.WarrantStatus current = warrant.getStatus();
+        if (!transitionPolicy.isAllowed(current, TrackWarrant.WarrantStatus.VOID)) {
+            throw new InvalidWarrantTransitionException(current, TrackWarrant.WarrantStatus.VOID);
+        }
+
+        warrant.setLimitsClearAt(limitsClearAt);
+        warrant.setLimitsClearBy(limitsClearBy);
+        warrant.setStatus(TrackWarrant.WarrantStatus.VOID);
+
+        TrackWarrant saved = repository.save(warrant);
+        log.info("Limits clear recorded and warrant voided: {}", warrantId);
+        return saved;
     }
 
     /**

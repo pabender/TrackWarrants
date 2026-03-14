@@ -20,11 +20,11 @@ public class WarrantStatusTransitionPolicy {
         transitions = new EnumMap<>(TrackWarrant.WarrantStatus.class);
         transitions.put(TrackWarrant.WarrantStatus.ACTIVE,
             EnumSet.of(
-                TrackWarrant.WarrantStatus.COMPLETED,
+                TrackWarrant.WarrantStatus.VOID,
                 TrackWarrant.WarrantStatus.CANCELLED,
                 TrackWarrant.WarrantStatus.EXPIRED
             ));
-        transitions.put(TrackWarrant.WarrantStatus.COMPLETED, EnumSet.noneOf(TrackWarrant.WarrantStatus.class));
+        transitions.put(TrackWarrant.WarrantStatus.VOID, EnumSet.noneOf(TrackWarrant.WarrantStatus.class));
         transitions.put(TrackWarrant.WarrantStatus.CANCELLED, EnumSet.noneOf(TrackWarrant.WarrantStatus.class));
         transitions.put(TrackWarrant.WarrantStatus.EXPIRED, EnumSet.noneOf(TrackWarrant.WarrantStatus.class));
     }

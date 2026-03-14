@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.trainbeans.trackwarrants.main.dto.CreateWarrantRequest;
+import org.trainbeans.trackwarrants.main.dto.LimitsClearRequest;
 import org.trainbeans.trackwarrants.main.dto.TrackWarrantResponse;
 import org.trainbeans.trackwarrants.main.entity.TrackWarrant;
 import org.trainbeans.trackwarrants.main.mapper.TrackWarrantMapper;
@@ -113,15 +114,32 @@ public class TrackWarrantController {
     }
 
     /**
-     * Mark a track warrant as completed.
+     * Mark a track warrant as void.
      * PUT /api/warrants/{warrantId}/complete
      */
     @PutMapping("/{warrantId}/complete")
     public ResponseEntity<TrackWarrantResponse> completeWarrant(@PathVariable String warrantId) {
-        log.info("PUT /api/warrants/{}/complete - Completing warrant", warrantId);
+        log.info("PUT /api/warrants/{}/complete - Voiding warrant", warrantId);
 
         TrackWarrant completed = service.completeWarrant(warrantId);
         TrackWarrantResponse response = mapper.toResponse(completed);
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Record limits reported clear and mark warrant as void.
+     * PUT /api/warrants/{warrantId}/limits-clear
+     */
+    @PutMapping("/{warrantId}/limits-clear")
+    public ResponseEntity<TrackWarrantResponse> recordLimitsClear(
+            @PathVariable String warrantId,
+            @RequestBody LimitsClearRequest request) {
+        log.info("PUT /api/warrants/{}/limits-clear - Recording limits clear", warrantId);
+
+        TrackWarrant updated = ((TrackWarrantService) service).recordLimitsClear(
+            warrantId, request.getLimitsClearAt(), request.getLimitsClearBy());
+        TrackWarrantResponse response = mapper.toResponse(updated);
 
         return ResponseEntity.ok(response);
     }

@@ -79,7 +79,7 @@ public class DataInitializer {
                 .line13To("SALT LAKE CITY")
                 .build();
 
-            // Create sample warrant 3 (completed)
+            // Create sample warrant 3 (void)
             TrackWarrant warrant3 = TrackWarrant.builder()
                 .warrantId(today + "-3")
                 .warrantNumber(3)
@@ -89,7 +89,7 @@ public class DataInitializer {
                 .location("PITTSBURGH JUNCTION")
                 .startingLocation("PITTSBURGH JUNCTION")
                 .issuedDateTime(now.minusHours(6))
-                .status(TrackWarrant.WarrantStatus.COMPLETED)
+                .status(TrackWarrant.WarrantStatus.VOID)
                 .issuedBy("Dispatcher Smith")
                 .okTime("0345")
                 .dispatcher("SMITH")
