@@ -68,7 +68,9 @@ class TrackWarrantServiceTest {
             .okTime("0800")
             .dispatcher("Dispatcher Test")
             .copiedBy("CONDUCTOR B")
-            .line2Instruction("Proceed from Station A to Station B on Main Line Track")
+            .line2From("Station A")
+            .line2To("Station B")
+            .line2Track("Main Line")
             .createdDateTime(now)
             .lastModifiedDateTime(now)
             .build();
@@ -85,7 +87,9 @@ class TrackWarrantServiceTest {
             .okTime("0900")
             .dispatcher("Test Dispatcher")
             .copiedBy("CONDUCTOR D")
-            .line2Instruction("Proceed from Start to End on Test Track Track")
+            .line2From("Start")
+            .line2To("End")
+            .line2Track("Test")
             .build();
     }
 

@@ -683,23 +683,36 @@
             syncLineChecksFromData();
 
             const lineValues = {
-                line1Instruction: checked('l1_on') ? `Track Warrant NO. ${v('l1_void_number') || '_____'} is Void.` : null,
-                line2Instruction: checked('l2_on') ? `Proceed from ${v('l2_from') || '_____'} to ${v('l2_to') || '_____'} on ${v('l2_track') || '_____'} Track` : null,
-                line3Instruction: checked('l3_on') ? `Proceed from ${v('l3_from') || '_____'} to ${v('l3_to') || '_____'} on ${v('l3_track') || '_____'} Track` : null,
-                line4Instruction: checked('l4_on') ? `Work between ${v('l4_from') || '_____'} and ${v('l4_to') || '_____'} on ${v('l4_track') || '_____'} Track` : null,
-                line5Instruction: checked('l5_on') ? `Not in effect until ${v('l5_until') || '_____'}M` : null,
-                line6Instruction: checked('l6_on') ? `This Authority Expires at ${v('l6_time') || '_____'}M` : null,
-                line7Instruction: checked('l7_on') ? `Not in effect until after arrival of ${v('l7_train') || '_____'} at ${v('l7_at') || '_____'}` : null,
-                line8Instruction: checked('l8_on') ? `Hold Main Track at Last Named Point.` : null,
-                line9Instruction: checked('l9_on') ? `Do Not Foul Limints ahead of ${v('l9_ahead') || '_____'}.` : null,
-                line10Instruction: checked('l10_on') ? `Clear Main Track at Last Named Point.` : null,
-                line11Instruction: checked('l11_on') ? `Between ${v('l11_from') || '_____'} and ${v('l11_to') || '_____'} Make All Movements at restricted speed. Limits occupied by train or engine.` : null,
-                line12Instruction: checked('l12_on') ? `Between ${v('l12_from') || '_____'} and ${v('l12_to') || '_____'} Make All Movements at restricted speed and stop short of Men or Machines fouling track.` : null,
-                line13Instruction: checked('l13_on') ? `Do not exceed ${v('l13_mph') || '_____'} MPH between ${v('l13_from') || '_____'} and ${v('l13_to') || '_____'}` : null,
-                line14Instruction: checked('l14_on') ? `Do not exceed ${v('l14_mph') || '_____'} MPH between ${v('l14_from') || '_____'} and ${v('l14_to') || '_____'}` : null,
-                line15Instruction: checked('l15_on') ? `Protection as prescribed by Rule 99 not required.` : null,
-                line16Instruction: checked('l16_on') ? `Track Bulletins in Effect: ${[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16].map(n => v('l16_b'+n)).filter(Boolean).join(', ')}` : null,
-                line17Instruction: checked('l17_on') ? `Other Specific Instructions: ${v('l17_text') || '_____'}` : null
+                line1VoidNumber:  checked('l1_on')  ? v('l1_void_number') || null : null,
+                line2From:        checked('l2_on')  ? v('l2_from')  || null : null,
+                line2To:          checked('l2_on')  ? v('l2_to')    || null : null,
+                line2Track:       checked('l2_on')  ? v('l2_track') || null : null,
+                line3From:        checked('l3_on')  ? v('l3_from')  || null : null,
+                line3To:          checked('l3_on')  ? v('l3_to')    || null : null,
+                line3Track:       checked('l3_on')  ? v('l3_track') || null : null,
+                line4From:        checked('l4_on')  ? v('l4_from')  || null : null,
+                line4To:          checked('l4_on')  ? v('l4_to')    || null : null,
+                line4Track:       checked('l4_on')  ? v('l4_track') || null : null,
+                line5Until:       checked('l5_on')  ? v('l5_until') || null : null,
+                line6Time:        checked('l6_on')  ? v('l6_time')  || null : null,
+                line7Train:       checked('l7_on')  ? v('l7_train') || null : null,
+                line7At:          checked('l7_on')  ? v('l7_at')    || null : null,
+                line8Checked:     checked('l8_on')  ? true : null,
+                line9Ahead:       checked('l9_on')  ? v('l9_ahead') || null : null,
+                line10Checked:    checked('l10_on') ? true : null,
+                line11From:       checked('l11_on') ? v('l11_from') || null : null,
+                line11To:         checked('l11_on') ? v('l11_to')   || null : null,
+                line12From:       checked('l12_on') ? v('l12_from') || null : null,
+                line12To:         checked('l12_on') ? v('l12_to')   || null : null,
+                line13Mph:        checked('l13_on') ? v('l13_mph')  || null : null,
+                line13From:       checked('l13_on') ? v('l13_from') || null : null,
+                line13To:         checked('l13_on') ? v('l13_to')   || null : null,
+                line14Mph:        checked('l14_on') ? v('l14_mph')  || null : null,
+                line14From:       checked('l14_on') ? v('l14_from') || null : null,
+                line14To:         checked('l14_on') ? v('l14_to')   || null : null,
+                line15Checked:    checked('l15_on') ? true : null,
+                line16Text:       checked('l16_on') ? [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16].map(n => v('l16_b'+n)).filter(Boolean).join(', ') || null : null,
+                line17Text:       checked('l17_on') ? v('l17_text') || null : null
             };
 
             const warrantDate = v('warrantDate') || new Date().toISOString().slice(0, 10);
@@ -738,12 +751,11 @@
             if (!data.copiedBy)      errors.push('Copied By is required.');
 
             const anyLine = [
-                data.line1Instruction, data.line2Instruction, data.line3Instruction,
-                data.line4Instruction, data.line5Instruction, data.line6Instruction,
-                data.line7Instruction, data.line8Instruction, data.line9Instruction,
-                data.line10Instruction, data.line11Instruction, data.line12Instruction,
-                data.line13Instruction, data.line14Instruction, data.line15Instruction,
-                data.line16Instruction, data.line17Instruction
+                data.line1VoidNumber, data.line2From, data.line3From, data.line4From,
+                data.line5Until, data.line6Time, data.line7Train,
+                data.line8Checked, data.line9Ahead, data.line10Checked,
+                data.line11From, data.line12From, data.line13Mph, data.line14Mph,
+                data.line15Checked, data.line16Text, data.line17Text
             ].some(Boolean);
             if (!anyLine) errors.push('At least one instruction line must be checked.');
 
@@ -751,14 +763,25 @@
         }
 
         function warrantInstructionSummary(w) {
-            const lines = [
-                w.line1Instruction, w.line2Instruction, w.line3Instruction, w.line4Instruction,
-                w.line5Instruction, w.line6Instruction, w.line7Instruction, w.line8Instruction,
-                w.line9Instruction, w.line10Instruction, w.line11Instruction, w.line12Instruction,
-                w.line13Instruction, w.line14Instruction, w.line15Instruction,
-                w.line16Instruction, w.line17Instruction
-            ].filter(Boolean);
-            return lines.length ? lines.join(' | ') : 'None';
+            const parts = [];
+            if (w.line1VoidNumber)  parts.push(`Void: ${w.line1VoidNumber}`);
+            if (w.line2From)        parts.push(`Proceed: ${w.line2From} → ${w.line2To || '?'}`);
+            if (w.line3From)        parts.push(`Proceed: ${w.line3From} → ${w.line3To || '?'}`);
+            if (w.line4From)        parts.push(`Work: ${w.line4From} – ${w.line4To || '?'}`);
+            if (w.line5Until)       parts.push(`Not until: ${w.line5Until}M`);
+            if (w.line6Time)        parts.push(`Expires: ${w.line6Time}M`);
+            if (w.line7Train)       parts.push(`After: ${w.line7Train} at ${w.line7At || '?'}`);
+            if (w.line8Checked)     parts.push('Hold Main Track');
+            if (w.line9Ahead)       parts.push(`Don't Foul: ${w.line9Ahead}`);
+            if (w.line10Checked)    parts.push('Clear Main Track');
+            if (w.line11From)       parts.push(`Restricted: ${w.line11From} – ${w.line11To || '?'}`);
+            if (w.line12From)       parts.push(`Restricted/Men: ${w.line12From} – ${w.line12To || '?'}`);
+            if (w.line13Mph)        parts.push(`Max ${w.line13Mph}MPH: ${w.line13From || '?'} – ${w.line13To || '?'}`);
+            if (w.line14Mph)        parts.push(`Max ${w.line14Mph}MPH: ${w.line14From || '?'} – ${w.line14To || '?'}`);
+            if (w.line15Checked)    parts.push('No Rule 99');
+            if (w.line16Text)       parts.push(`Bulletins: ${w.line16Text}`);
+            if (w.line17Text)       parts.push(`Other: ${w.line17Text}`);
+            return parts.length ? parts.join(' | ') : 'None';
         }
 
         // Create warrant (line-driven)

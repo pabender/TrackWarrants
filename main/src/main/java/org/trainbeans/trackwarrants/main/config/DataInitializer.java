@@ -44,9 +44,13 @@ public class DataInitializer {
                 .okTime("0930")
                 .dispatcher("JONES")
                 .copiedBy("SMITH")
-                .line2Instruction("Proceed from CHICAGO UNION STATION to ST. LOUIS TERMINAL on ILLINOIS MAIN LINE Track")
-                .line6Instruction("This Authority Expires at " + now.plusHours(8).toLocalTime().toString().substring(0, 5) + "M")
-                .line13Instruction("Do not exceed 79 MPH between CHICAGO UNION STATION and ST. LOUIS TERMINAL")
+                .line2From("CHICAGO UNION STATION")
+                .line2To("ST. LOUIS TERMINAL")
+                .line2Track("ILLINOIS MAIN LINE")
+                .line6Time(now.plusHours(8).toLocalTime().toString().substring(0, 5))
+                .line13Mph("79")
+                .line13From("CHICAGO UNION STATION")
+                .line13To("ST. LOUIS TERMINAL")
                 .build();
 
             // Create sample warrant 2
@@ -64,10 +68,15 @@ public class DataInitializer {
                 .okTime("0715")
                 .dispatcher("MARTINEZ")
                 .copiedBy("LEE")
-                .line2Instruction("Proceed from DENVER YARD to SALT LAKE CITY on MOUNTAIN SUBDIVISION Track")
-                .line6Instruction("This Authority Expires at " + now.minusHours(2).plusHours(10).toLocalTime().toString().substring(0, 5) + "M")
-                .line12Instruction("Between DENVER YARD and SALT LAKE CITY Make All Movements at restricted speed and stop short of Men or Machines fouling track.")
-                .line13Instruction("Do not exceed 60 MPH between DENVER YARD and SALT LAKE CITY")
+                .line2From("DENVER YARD")
+                .line2To("SALT LAKE CITY")
+                .line2Track("MOUNTAIN SUBDIVISION")
+                .line6Time(now.minusHours(2).plusHours(10).toLocalTime().toString().substring(0, 5))
+                .line12From("DENVER YARD")
+                .line12To("SALT LAKE CITY")
+                .line13Mph("60")
+                .line13From("DENVER YARD")
+                .line13To("SALT LAKE CITY")
                 .build();
 
             // Create sample warrant 3 (completed)
@@ -87,9 +96,13 @@ public class DataInitializer {
                 .copiedBy("WILSON")
                 .limitsClearAt("CLEVELAND TERMINAL")
                 .limitsClearBy("CONDUCTOR WILSON")
-                .line2Instruction("Proceed from PITTSBURGH JUNCTION to CLEVELAND TERMINAL on OHIO MAIN LINE Track")
-                .line6Instruction("This Authority Expires at " + now.minusHours(1).toLocalTime().toString().substring(0, 5) + "M")
-                .line13Instruction("Do not exceed 70 MPH between PITTSBURGH JUNCTION and CLEVELAND TERMINAL")
+                .line2From("PITTSBURGH JUNCTION")
+                .line2To("CLEVELAND TERMINAL")
+                .line2Track("OHIO MAIN LINE")
+                .line6Time(now.minusHours(1).toLocalTime().toString().substring(0, 5))
+                .line13Mph("70")
+                .line13From("PITTSBURGH JUNCTION")
+                .line13To("CLEVELAND TERMINAL")
                 .build();
 
             repository.save(warrant1);

@@ -488,6 +488,46 @@
             return `<span class='line-fill'>${(text || '_______').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>`;
         }
 
+        function buildLineText(num, warrant) {
+            switch (num) {
+                case 1:  return warrant.line1VoidNumber
+                    ? `Track Warrant NO. ${fillHtml(warrant.line1VoidNumber)} is Void.` : null;
+                case 2:  return warrant.line2From
+                    ? `Proceed from ${fillHtml(warrant.line2From)} to ${fillHtml(warrant.line2To)} on ${fillHtml(warrant.line2Track)} Track` : null;
+                case 3:  return warrant.line3From
+                    ? `Proceed from ${fillHtml(warrant.line3From)} to ${fillHtml(warrant.line3To)} on ${fillHtml(warrant.line3Track)} Track` : null;
+                case 4:  return warrant.line4From
+                    ? `Work between ${fillHtml(warrant.line4From)} and ${fillHtml(warrant.line4To)} on ${fillHtml(warrant.line4Track)} Track` : null;
+                case 5:  return warrant.line5Until
+                    ? `Not in effect until ${fillHtml(warrant.line5Until)}M` : null;
+                case 6:  return warrant.line6Time
+                    ? `This Authority Expires at ${fillHtml(warrant.line6Time)}M` : null;
+                case 7:  return warrant.line7Train
+                    ? `Not in effect until after arrival of ${fillHtml(warrant.line7Train)} at ${fillHtml(warrant.line7At)}` : null;
+                case 8:  return warrant.line8Checked
+                    ? `Hold Main Track at Last Named Point.` : null;
+                case 9:  return warrant.line9Ahead
+                    ? `Do Not Foul Limints ahead of ${fillHtml(warrant.line9Ahead)}.` : null;
+                case 10: return warrant.line10Checked
+                    ? `Clear Main Track at Last Named Point.` : null;
+                case 11: return warrant.line11From
+                    ? `Between ${fillHtml(warrant.line11From)} and ${fillHtml(warrant.line11To)} Make All Movements at restricted speed. Limits occupied by train or engine.` : null;
+                case 12: return warrant.line12From
+                    ? `Between ${fillHtml(warrant.line12From)} and ${fillHtml(warrant.line12To)} Make All Movements at restricted speed and stop short of Men or Machines fouling track.` : null;
+                case 13: return warrant.line13Mph
+                    ? `Do not exceed ${fillHtml(warrant.line13Mph)} MPH between ${fillHtml(warrant.line13From)} and ${fillHtml(warrant.line13To)}` : null;
+                case 14: return warrant.line14Mph
+                    ? `Do not exceed ${fillHtml(warrant.line14Mph)} MPH between ${fillHtml(warrant.line14From)} and ${fillHtml(warrant.line14To)}` : null;
+                case 15: return warrant.line15Checked
+                    ? `Protection as prescribed by Rule 99 not required.` : null;
+                case 16: return warrant.line16Text
+                    ? `Track Bulletins in Effect: ${fillHtml(warrant.line16Text)}` : null;
+                case 17: return warrant.line17Text
+                    ? `Other Specific Instructions: ${fillHtml(warrant.line17Text)}` : null;
+                default: return null;
+            }
+        }
+
         function fallbackLine(num, warrant) {
             const from = warrant.startingLocation || '_______';
             switch (num) {
@@ -536,28 +576,8 @@
 
             const box = document.getElementById('instructionsBox');
 
-            const lineFieldMap = {
-                1: warrant.line1Instruction,
-                2: warrant.line2Instruction,
-                3: warrant.line3Instruction,
-                4: warrant.line4Instruction,
-                5: warrant.line5Instruction,
-                6: warrant.line6Instruction,
-                7: warrant.line7Instruction,
-                8: warrant.line8Instruction,
-                9: warrant.line9Instruction,
-                10: warrant.line10Instruction,
-                11: warrant.line11Instruction,
-                12: warrant.line12Instruction,
-                13: warrant.line13Instruction,
-                14: warrant.line14Instruction,
-                15: warrant.line15Instruction,
-                16: warrant.line16Instruction,
-                17: warrant.line17Instruction
-            };
-
             const lines = WARRANT_LINES.map(t => {
-                const structuredText = (lineFieldMap[t.num] || '').trim();
+                const structuredText = buildLineText(t.num, warrant) || '';
                 const fallbackText = fallbackLine(t.num, warrant);
                 const text = structuredText || fallbackText;
 
