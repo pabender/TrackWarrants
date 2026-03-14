@@ -131,15 +131,6 @@ public class TrackWarrantService implements TrackWarrantUseCase {
     }
 
     /**
-     * Cancel a track warrant.
-     */
-    @Override
-    public TrackWarrant cancelWarrant(String warrantId) {
-        log.info("Cancelling track warrant: {}", warrantId);
-        return updateWarrantStatus(warrantId, TrackWarrant.WarrantStatus.CANCELLED);
-    }
-
-    /**
      * Record limits reported clear and mark warrant as void.
      */
     public TrackWarrant recordLimitsClear(String warrantId, String limitsClearAt, String limitsClearBy) {

@@ -21,11 +21,9 @@ public class WarrantStatusTransitionPolicy {
         transitions.put(TrackWarrant.WarrantStatus.ACTIVE,
             EnumSet.of(
                 TrackWarrant.WarrantStatus.VOID,
-                TrackWarrant.WarrantStatus.CANCELLED,
                 TrackWarrant.WarrantStatus.EXPIRED
             ));
         transitions.put(TrackWarrant.WarrantStatus.VOID, EnumSet.noneOf(TrackWarrant.WarrantStatus.class));
-        transitions.put(TrackWarrant.WarrantStatus.CANCELLED, EnumSet.noneOf(TrackWarrant.WarrantStatus.class));
         transitions.put(TrackWarrant.WarrantStatus.EXPIRED, EnumSet.noneOf(TrackWarrant.WarrantStatus.class));
     }
 

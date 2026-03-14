@@ -145,20 +145,6 @@ public class TrackWarrantController {
     }
 
     /**
-     * Cancel a track warrant.
-     * PUT /api/warrants/{warrantId}/cancel
-     */
-    @PutMapping("/{warrantId}/cancel")
-    public ResponseEntity<TrackWarrantResponse> cancelWarrant(@PathVariable String warrantId) {
-        log.info("PUT /api/warrants/{}/cancel - Cancelling warrant", warrantId);
-
-        TrackWarrant cancelled = service.cancelWarrant(warrantId);
-        TrackWarrantResponse response = mapper.toResponse(cancelled);
-
-        return ResponseEntity.ok(response);
-    }
-
-    /**
      * Delete a track warrant.
      * DELETE /api/warrants/{warrantId}
      */

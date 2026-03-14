@@ -162,17 +162,6 @@ class TrackWarrantControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("PUT /api/warrants/{warrantId}/cancel - Should cancel a warrant")
-    void testCancelWarrant() throws Exception {
-        createTestWarrant("TW-CANCEL-001", "TRAIN-456", TrackWarrant.WarrantStatus.ACTIVE);
-
-        mockMvc.perform(put("/api/warrants/TW-CANCEL-001/cancel"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.warrantId").value("TW-CANCEL-001"))
-            .andExpect(jsonPath("$.status").value("CANCELLED"));
-    }
-
-    @Test
     @DisplayName("DELETE /api/warrants/{warrantId} - Should delete a warrant")
     void testDeleteWarrant() throws Exception {
         createTestWarrant("TW-DELETE-001", "TRAIN-789", TrackWarrant.WarrantStatus.ACTIVE);
